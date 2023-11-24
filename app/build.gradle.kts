@@ -9,7 +9,6 @@ android {
 
     buildFeatures {
         viewBinding = true
-        dataBinding = true
     }
 
     defaultConfig {
@@ -38,7 +37,7 @@ android {
 }
 
 dependencies {
-
+    implementation("com.github.androidmads:QRGenerator:1.0.1")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.databinding:viewbinding:8.1.4")
     implementation("androidx.appcompat:appcompat:1.6.1")
