@@ -1,14 +1,15 @@
 package com.example.movierecommender
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.Point
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Display
 import android.view.View
 import android.view.WindowManager
-import android.widget.ImageView
+import android.view.inputmethod.InputMethodManager
 import com.example.movierecommender.databinding.ActivityCreateRoomBinding
 import androidmads.library.qrgenearator.QRGContents;
 import androidmads.library.qrgenearator.QRGEncoder;
@@ -21,6 +22,7 @@ class CreateRoom : AppCompatActivity() {
     lateinit var qrgEncoder:QRGEncoder
     lateinit var bitmap: Bitmap
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCreateRoomBinding.inflate(layoutInflater)
@@ -31,6 +33,11 @@ class CreateRoom : AppCompatActivity() {
             startActivity(intent)
         })
         displayQR()
+    }
+
+    fun Context.hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     fun displayQR(){

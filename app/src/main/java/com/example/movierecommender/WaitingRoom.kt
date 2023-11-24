@@ -6,37 +6,37 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import com.example.movierecommender.databinding.ActivityCreateRoomBinding
-import com.example.movierecommender.databinding.ActivityJoinRoomBinding
+import com.example.movierecommender.UtilsM
+import com.example.movierecommender.databinding.WaitingRoomBinding
 
-class JoinRoom : AppCompatActivity() {
-    private lateinit var binding:ActivityJoinRoomBinding
-    @SuppressLint("ClickableViewAccessibility")
+class WaitingRoom : AppCompatActivity() {
+    private lateinit var binding: WaitingRoomBinding
+
+    @SuppressLint("ClickableViewAccessibility") //TODO look for a better way
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityJoinRoomBinding.inflate(layoutInflater)
+
+        binding = WaitingRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val b = intent.extras
+        if (b != null) {
+            binding.roomId.setText(b.getString("roomcode"))
+        }
         binding.cancel.setOnClickListener(View.OnClickListener(){
             val intent = Intent(this,MainActivity::class.java)
             startActivity(intent)
         })
-        binding.joinBtn.setOnClickListener(View.OnClickListener {
-            //TODO send join request to some endpoint, for now go to empty lobby
-            val roomcode = binding.roomidText.text.toString()
-            val b = Bundle()
-            b.putString("roomcode",roomcode)
-            val intent = Intent(this, WaitingRoom::class.java)
-            intent.putExtras(b)
-            startActivity(intent)
-        })
+
         binding.mainid.setOnTouchListener(View.OnTouchListener { view, _->
+            val cont = view.context
             hideKeyboard(view)
             return@OnTouchListener true
         })
     }
-    fun Context.hideKeyboard(view: View) {
+    fun Context.hideKeyboard(view:View) { // TODO extract to UtilsM
         val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }

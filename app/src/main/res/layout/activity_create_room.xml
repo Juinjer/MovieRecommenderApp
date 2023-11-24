@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/mainid"
     tools:context=".CreateRoom">
 
     <Button
@@ -42,12 +43,15 @@
 
     <EditText
         android:id="@+id/roomidnumber"
-        android:layout_width="122dp"
+        android:layout_width="100dp"
         android:layout_height="42dp"
         android:layout_marginTop="28dp"
+        android:clickable="false"
+        android:cursorVisible="false"
         android:ems="10"
-        android:inputType="number"
+        android:focusable="false"
         android:text="1 2 3 4 5 6"
+        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.25"
         app:layout_constraintStart_toEndOf="@+id/id"
@@ -70,9 +74,10 @@
         android:id="@+id/settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
         android:layout_marginTop="60dp"
         android:text="Settings"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.22"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/id" />
 
@@ -80,9 +85,11 @@
         android:id="@+id/qrtext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="116dp"
+        android:layout_marginTop="44dp"
         android:text="Scan QR code to join:"
+        app:layout_constraintBottom_toTopOf="@+id/idIVQrcode"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/settings" />
 
@@ -91,10 +98,11 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_centerHorizontal="true"
+        android:adjustViewBounds="false"
         android:contentDescription="qrcode"
-        android:adjustViewBounds="true"
         app:layout_constraintBottom_toTopOf="@+id/start"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/qrtext" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.73" />
 </androidx.constraintlayout.widget.ConstraintLayout>
