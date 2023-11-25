@@ -2,11 +2,15 @@ package com.example.movierecommender
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -28,6 +32,14 @@ class CreateRoom : AppCompatActivity() {
         binding = ActivityCreateRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val b = intent.extras
+        Log.d("rid", b.toString())
+        if (b != null) {
+            val s = b.getString("roomcode")
+            val editable: Editable = Editable.Factory.getInstance().newEditable(s)
+            binding.roomidnumber.text = editable
+        }
+
         binding.cancel.setOnClickListener(View.OnClickListener() {
             val intent = Intent(this,MainActivity::class.java)
             startActivity(intent)
@@ -35,6 +47,17 @@ class CreateRoom : AppCompatActivity() {
         binding.start.setOnClickListener(View.OnClickListener {
             val intent = Intent(this,SwipeScreen::class.java)
             startActivity(intent)
+        })
+        binding.settings.setOnClickListener(View.OnClickListener {
+            val intent = Intent(this,SettingsScreen::class.java)
+            startActivity(intent)
+        })
+
+        binding.copyBtn.setOnClickListener(View.OnClickListener {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val id = binding.roomidnumber.text.toString()
+            val clip = ClipData.newPlainText("test", id)
+            clipboard.setPrimaryClip(clip)
         })
 
         displayQR()
@@ -47,7 +70,7 @@ class CreateRoom : AppCompatActivity() {
 
     fun displayQR(){
         val dim = min(binding.idIVQrcode.layoutParams.height,binding.idIVQrcode.layoutParams.width)
-        val uri = "http://example.com/${binding.roomidnumber}"
+        val uri = "http://localhost:8080/api/joinroom?q=${binding.roomidnumber}"
         qrgEncoder = QRGEncoder(uri, null, QRGContents.Type.TEXT,dim) //TODO: image always has padding, dunno why
         try {
             bitmap = qrgEncoder.bitmap

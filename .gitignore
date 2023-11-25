@@ -1,17 +1,19 @@
 *.iml
 .gradle
-/local.properties
+/secrets.properties
 .idea/*
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
-local.properties
+secrets.properties
 *.properties
 gradlew*
 gradle/*
 *.webp
+backend/node_modules
+*package-lock.json
 
 *.apk
 *.ap_
@@ -28,7 +30,7 @@ bin/
 gen/
                             
 # Local configuration file (sdk path, etc)
-local.properties
+secrets.properties
                         
 # Windows thumbnail db
 Thumbs.db
