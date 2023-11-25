@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             queue.add(stringReq)
         })
         binding.join.setOnClickListener(View.OnClickListener {
-            val intent = Intent(this,JoinRoom::class.java)
+            val intent = Intent(this, JoinRoom::class.java)
             startActivity(intent)
         })
     }

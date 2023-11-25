@@ -28,8 +28,8 @@ class WaitingRoom : AppCompatActivity() {
             val editable: Editable = Editable.Factory.getInstance().newEditable(s)
             binding.roomId.text = editable
         }
-        binding.cancel.setOnClickListener(View.OnClickListener(){
-            val intent = Intent(this,MainActivity::class.java)
+        binding.cancel.setOnClickListener(View.OnClickListener() {
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         })
 

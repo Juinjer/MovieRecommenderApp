@@ -1,3 +1,3 @@
 package com.example.movierecommender
 
-data class Name(val image:Int, val name:String)
+data class Name(val image: Int, val name: String)
