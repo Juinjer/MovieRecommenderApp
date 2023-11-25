@@ -27,6 +27,7 @@ class JoinRoom : AppCompatActivity() {
             val roomcode = binding.roomidText.text.toString()
             val b = Bundle()
             b.putString("roomcode",roomcode)
+            b.putString("name", UtilsM.getName(listOf()))
             val intent = Intent(this, WaitingRoom::class.java)
             intent.putExtras(b)
             startActivity(intent)

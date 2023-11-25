@@ -19,8 +19,8 @@ import java.lang.Integer.min
 class CreateRoom : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreateRoomBinding
-    lateinit var qrgEncoder:QRGEncoder
-    lateinit var bitmap: Bitmap
+    private lateinit var qrgEncoder:QRGEncoder
+    private lateinit var bitmap: Bitmap
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +32,11 @@ class CreateRoom : AppCompatActivity() {
             val intent = Intent(this,MainActivity::class.java)
             startActivity(intent)
         })
+        binding.start.setOnClickListener(View.OnClickListener {
+            val intent = Intent(this,SwipeScreen::class.java)
+            startActivity(intent)
+        })
+
         displayQR()
     }
 
@@ -41,8 +46,6 @@ class CreateRoom : AppCompatActivity() {
     }
 
     fun displayQR(){
-        val manager = getSystemService(WINDOW_SERVICE) as WindowManager
-//        @Suppress("DEPRECATION")
         val dim = min(binding.idIVQrcode.layoutParams.height,binding.idIVQrcode.layoutParams.width)
         val uri = "http://example.com/${binding.roomidnumber}"
         qrgEncoder = QRGEncoder(uri, null, QRGContents.Type.TEXT,dim) //TODO: image always has padding, dunno why
