@@ -37,11 +37,13 @@ class WaitingRoom : AppCompatActivity() {
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(this)
         nameList = ArrayList()
-        nameList.add(Name(R.mipmap.camera_logo_foreground, "Testnaam"))
-        nameList.add(Name(R.mipmap.camera_logo_foreground, "Testnaam1"))
-        nameList.add(Name(R.mipmap.camera_logo_foreground, "Testnaam2"))
-        nameList.add(Name(R.mipmap.camera_logo_foreground, "Testnaam3"))
-        nameList.add(Name(R.mipmap.camera_logo_foreground, "Testnaam4"))
+        if (b != null) {
+            val s = b.getString("members")!!
+            val splitted = s.split(",")
+            for(st in splitted) {
+                nameList.add(Name(R.mipmap.camera_logo_foreground,st))
+            }
+        }
 
         nameAdapter = NameAdapter(nameList)
         recyclerView.adapter = nameAdapter

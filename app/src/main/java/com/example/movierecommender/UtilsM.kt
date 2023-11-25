@@ -2,6 +2,8 @@ package com.example.movierecommender;
 
 import android.app.Activity
 import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.view.View;
 import android.view.inputmethod.InputMethodManager
 import kotlin.random.Random
@@ -30,5 +32,12 @@ object UtilsM {
             }
         }
         return names[0] + "1" //TODO
+    }
+
+    fun getEndPoint(context: Context): String {
+        val ai: ApplicationInfo = context.packageManager
+            .getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+        val value = ai.metaData.getString("webServerUrl")
+        return value.toString()
     }
 }

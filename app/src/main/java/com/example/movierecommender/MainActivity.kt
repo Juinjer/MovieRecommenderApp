@@ -25,15 +25,14 @@ class MainActivity : AppCompatActivity() {
         val ai: ApplicationInfo = applicationContext.packageManager
             .getApplicationInfo(applicationContext.packageName, PackageManager.GET_META_DATA)
         val value = ai.metaData.getString("webServerUrl")
-        val key = value.toString()
+        val endpoint = value.toString()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.create.setOnClickListener(View.OnClickListener() {
             val queue = Volley.newRequestQueue(this)
-//            var code = ""
 
-            val url = "$key/api/createRoom?id=$id"
+            val url = "$endpoint/api/createRoom?id=$id"
             val stringReq = StringRequest(Request.Method.GET, url,
                 {response -> val b = Bundle()
                     b.putString("roomcode",response)
@@ -50,12 +49,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun generateID(): String {
-        val preferences = getPreferences(Context.MODE_PRIVATE)
-        val editor = preferences.edit()
-        if (preferences.getString("unique_id", "")==null) {
-            editor.putString("unique_id", UUID.randomUUID().toString())
-            editor.apply()
+        val uid = application as UniqueID
+        if (!uid.initialized){
+            uid.setUniqueId(UUID.randomUUID().toString())
         }
-        return preferences.getString("unique_id", "")!!
+        return uid.uniqueId
     }
 }
