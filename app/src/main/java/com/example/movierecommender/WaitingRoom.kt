@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +24,9 @@ class WaitingRoom : AppCompatActivity() {
         setContentView(binding.root)
         val b = intent.extras
         if (b != null) {
-            binding.roomId.setText(b.getString("roomcode"))
+            val s = b.getString("roomcode")
+            val editable: Editable = Editable.Factory.getInstance().newEditable(s)
+            binding.roomId.text = editable
         }
         binding.cancel.setOnClickListener(View.OnClickListener() {
             val intent = Intent(this, MainActivity::class.java)
