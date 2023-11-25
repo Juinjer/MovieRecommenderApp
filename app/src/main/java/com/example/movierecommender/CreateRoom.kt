@@ -51,9 +51,8 @@ class CreateRoom : AppCompatActivity() {
         val uri = "http://example.com/${binding.roomidnumber}"
         qrgEncoder = QRGEncoder(uri, null, QRGContents.Type.TEXT, dim)
         //TODO: image always has padding, dunno why
-        // --> Zwarte rand door generator
+        // --> Zwarte rand door generator, aanpassing padding geen verschil
         // binding.idIVQrcode.setPadding(0, 0, 0, 0)
-        // Geen verschil...
         try {
             bitmap = qrgEncoder.bitmap
             binding.idIVQrcode.setImageBitmap(bitmap)
