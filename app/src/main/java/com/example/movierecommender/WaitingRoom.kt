@@ -25,8 +25,8 @@ class WaitingRoom : AppCompatActivity() {
         if (b != null) {
             binding.roomId.setText(b.getString("roomcode"))
         }
-        binding.cancel.setOnClickListener(View.OnClickListener(){
-            val intent = Intent(this,MainActivity::class.java)
+        binding.cancel.setOnClickListener(View.OnClickListener() {
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         })
 

@@ -19,7 +19,7 @@ import java.lang.Integer.min
 class CreateRoom : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreateRoomBinding
-    private lateinit var qrgEncoder:QRGEncoder
+    private lateinit var qrgEncoder: QRGEncoder
     private lateinit var bitmap: Bitmap
 
     @SuppressLint("ClickableViewAccessibility")
@@ -29,11 +29,11 @@ class CreateRoom : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.cancel.setOnClickListener(View.OnClickListener() {
-            val intent = Intent(this,MainActivity::class.java)
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         })
         binding.start.setOnClickListener(View.OnClickListener {
-            val intent = Intent(this,SwipeScreen::class.java)
+            val intent = Intent(this, SwipeScreen::class.java)
             startActivity(intent)
         })
 
@@ -41,18 +41,23 @@ class CreateRoom : AppCompatActivity() {
     }
 
     fun Context.hideKeyboard(view: View) {
-        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputMethodManager =
+            getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    fun displayQR(){
-        val dim = min(binding.idIVQrcode.layoutParams.height,binding.idIVQrcode.layoutParams.width)
+    fun displayQR() {
+        val dim = min(binding.idIVQrcode.layoutParams.width, binding.idIVQrcode.layoutParams.height)
         val uri = "http://example.com/${binding.roomidnumber}"
-        qrgEncoder = QRGEncoder(uri, null, QRGContents.Type.TEXT,dim) //TODO: image always has padding, dunno why
+        qrgEncoder = QRGEncoder(uri, null, QRGContents.Type.TEXT, dim)
+        //TODO: image always has padding, dunno why
+        // --> Zwarte rand door generator
+        // binding.idIVQrcode.setPadding(0, 0, 0, 0)
+        // Geen verschil...
         try {
             bitmap = qrgEncoder.bitmap
             binding.idIVQrcode.setImageBitmap(bitmap)
-        } catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

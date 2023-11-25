@@ -16,11 +16,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.create.setOnClickListener(View.OnClickListener() {
-            val intent = Intent(this,CreateRoom::class.java)
+            val intent = Intent(this, CreateRoom::class.java)
             startActivity(intent)
         })
         binding.join.setOnClickListener(View.OnClickListener {
-            val intent = Intent(this,JoinRoom::class.java)
+            val intent = Intent(this, JoinRoom::class.java)
             startActivity(intent)
         })
     }
