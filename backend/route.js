@@ -9,6 +9,8 @@ router.use((req, res, next) =>{
 })
 
 router.get("/createRoom", (req,res)=> {
+    const phoneId = req.query.id;
+    console.log(phoneId)
     let min = 100000;
     let max = 999999;
     let number = Math.floor(Math.random() * (max - min) + min);
