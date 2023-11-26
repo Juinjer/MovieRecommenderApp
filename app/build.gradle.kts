@@ -41,6 +41,7 @@ android {
 dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 
+    implementation("io.socket:socket.io-client:2.0.0")
     implementation("com.github.androidmads:QRGenerator:1.0.1")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.databinding:viewbinding:8.1.4")

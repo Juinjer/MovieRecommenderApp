@@ -27,24 +27,23 @@ class JoinRoom : AppCompatActivity() {
             startActivity(intent)
         })
         binding.joinBtn.setOnClickListener(View.OnClickListener {
-            //TODO send join request to some endpoint, for now go to empty lobby
             val roomId = binding.roomidText.text.toString()
-            val queue = Volley.newRequestQueue(this)
-            val endpoint = UtilsM.getEndPoint(this)
+            val mSocket = SocketHandler.getSocket()
             val uid= application as UniqueID
             val id = uid.uniqueId
-            val url = "$endpoint/api/joinRoom?id=$id&roomid=$roomId"
-            val stringReq = StringRequest(
-                Request.Method.GET, url,
-                {response ->
-                    val b = Bundle()
-                    b.putString("members", response)
-                    b.putString("roomcode", roomId)
-                    val intent = Intent(this, WaitingRoom::class.java)
-                    intent.putExtras(b)
-                    startActivity(intent)},
-                {er-> Log.e("buh",er.toString())})
-            queue.add(stringReq)
+            val data = listOf(roomId, id)
+            mSocket?.emit("joinRoom", data.joinToString(","))
+
+            mSocket?.on("jrRes"){args ->
+                Log.d("b1",args[0].toString())
+                Log.d("b2",args[1].toString())
+                val b = Bundle()
+                b.putString("members", args[0].toString())
+                b.putString("roomcode", args[1].toString())
+                val intent = Intent(this, WaitingRoom::class.java)
+                intent.putExtras(b)
+                startActivity(intent)
+            }
         })
         binding.mainid.setOnTouchListener(View.OnTouchListener { view, _ ->
             hideKeyboard(view)

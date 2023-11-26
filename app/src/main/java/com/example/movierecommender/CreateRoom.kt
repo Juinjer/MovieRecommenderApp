@@ -35,7 +35,7 @@ class CreateRoom : AppCompatActivity() {
         val b = intent.extras
         Log.d("rid", b.toString())
         if (b != null) {
-            val s = b.getString("roomcode")
+            val s = b.getString("rId")
             val editable: Editable = Editable.Factory.getInstance().newEditable(s)
             binding.roomidnumber.text = editable
         }

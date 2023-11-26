@@ -1,18 +1,12 @@
 package com.example.movierecommender
 
-import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.util.Log
 import android.view.View
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.example.movierecommender.databinding.ActivityMainBinding
+
 import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
@@ -21,31 +15,33 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val id = generateID()
-        val ai: ApplicationInfo = applicationContext.packageManager
-            .getApplicationInfo(applicationContext.packageName, PackageManager.GET_META_DATA)
-        val value = ai.metaData.getString("webServerUrl")
-        val endpoint = value.toString()
+        val endpoint = UtilsM.getEndPoint(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.create.setOnClickListener(View.OnClickListener() {
-            val queue = Volley.newRequestQueue(this)
-
-            val url = "$endpoint/api/createRoom?id=$id"
-            val stringReq = StringRequest(Request.Method.GET, url,
-                {response -> val b = Bundle()
-                    b.putString("roomcode",response)
-                    val intent = Intent(this,CreateRoom::class.java)
-                    intent.putExtras(b)
-                    startActivity(intent) },
-                {er->Log.e("buh",er.toString())})
-            queue.add(stringReq)
+            SocketHandler.setSocket("http://$endpoint")
+            SocketHandler.establishConnection()
+            val mSocket = SocketHandler.getSocket()
+            mSocket?.emit("createRoom", generateID())
+            mSocket?.on("crId") { args->
+                val id = args[0].toString()
+                val b = Bundle()
+                b.putString("rId", id)
+                val intent = Intent(this, CreateRoom::class.java)
+                intent.putExtras(b)
+                startActivity(intent)
+            }
         })
         binding.join.setOnClickListener(View.OnClickListener {
             val intent = Intent(this, JoinRoom::class.java)
             startActivity(intent)
         })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        SocketHandler.closeConnection()
     }
 
     fun generateID(): String {
