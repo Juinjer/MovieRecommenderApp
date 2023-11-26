@@ -20,6 +20,7 @@ class JoinRoom : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val endpoint = UtilsM.getEndPoint(this)
         binding = ActivityJoinRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.cancel.setOnClickListener(View.OnClickListener() {
@@ -28,15 +29,18 @@ class JoinRoom : AppCompatActivity() {
         })
         binding.joinBtn.setOnClickListener(View.OnClickListener {
             val roomId = binding.roomidText.text.toString()
-            val mSocket = SocketHandler.getSocket()
+            var mSocket = SocketHandler.getSocket()
+            if (mSocket==null){
+                SocketHandler.setSocket("http://${UtilsM.getEndPoint(this)}")
+                SocketHandler.establishConnection()
+                mSocket = SocketHandler.getSocket()
+            }
             val uid= application as UniqueID
             val id = uid.uniqueId
             val data = listOf(roomId, id)
             mSocket?.emit("joinRoom", data.joinToString(","))
 
             mSocket?.on("jrRes"){args ->
-                Log.d("b1",args[0].toString())
-                Log.d("b2",args[1].toString())
                 val b = Bundle()
                 b.putString("members", args[0].toString())
                 b.putString("roomcode", args[1].toString())

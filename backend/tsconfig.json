@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "strict": true,
+        "module": "CommonJS",
+        "target": "ESNext",
+        "lib": [
+            "ESNext",
+            "DOM"],
+        "outDir": "dist",
+        "resolveJsonModule": true,
+        "sourceMap": true,
+    },
+    "include": ["src"]
+}

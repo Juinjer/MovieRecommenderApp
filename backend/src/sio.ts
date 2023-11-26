@@ -1,0 +1,82 @@
+import * as http from 'http';
+import { Server as SocketIOServer, Socket } from 'socket.io';
+import { Room } from './roomlogic';
+
+const server = http.createServer();
+const io = new SocketIOServer(server);
+
+const roomlist: Room[] = [];
+const connections = new Map<string, Socket>();
+
+io.on('connection', (socket: Socket) => {
+  console.log('Client connected');
+
+  socket.on('createRoom', (message: string) => {
+    connections.set(message, socket);
+    console.log(`Received: ${message}`);
+    
+    find: {
+      for (const r of roomlist) {
+        if (message === r.getHost()) {
+          socket.emit("crId", `${r.getRoomId()}`);
+          break find;
+        }
+      }
+
+      const r = new Room(message);
+      roomlist.push(r);
+      socket.emit("crId", `${r.getRoomId()}`);
+    }
+  });
+
+  socket.on('joinRoom', (message: string) => {
+    const args = message.split(",");
+    connections.set(args[1], socket);
+
+    find: {
+      for (const r of roomlist) {
+        if (parseInt(args[0]) === r.getRoomId()) {
+          for (const member of r.getMembers()) {
+            const soc = connections.get(member);
+            soc?.emit("joinNotif", r.getNames().get(args[1]));
+          }
+
+          r.addMember(args[1]);
+          console.log("members " + r.getMembers().toString() + " names " + Array.from(r.getNames()).toString());
+          socket.emit("jrRes", Array.from(r.getNames().values()).toString(), `${r.getRoomId()}`);
+          break find;
+        }
+      }
+
+      socket.emit("jrRes", "404", "404");
+    }
+  });
+
+  socket.on('leaveRoom', (message: string) => {
+    console.log("TESTTTTT");
+    const args = message.split(",");
+
+    find: {
+      for (const r of roomlist) {
+        if (parseInt(args[0]) === r.getRoomId()) {
+          for (const member of r.getMembers()) {
+            const soc = connections.get(member);
+            soc?.emit("leaveNotif", r.getNames().get(args[1]));
+          }
+
+          r.removeMember(args[1]);
+          socket.disconnect();
+          break find;
+        }
+      }
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});
+
+server.listen(8080, () => {
+  console.log('Server listening on port 8080');
+});

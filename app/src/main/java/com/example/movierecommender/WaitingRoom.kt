@@ -29,6 +29,11 @@ class WaitingRoom : AppCompatActivity() {
             binding.roomId.text = editable
         }
         binding.cancel.setOnClickListener(View.OnClickListener() {
+            var mSocket = SocketHandler.getSocket()
+            val id= (application as UniqueID).uniqueId
+            val roomID = binding.roomId.text.toString()
+            val data = listOf(roomID, id)
+            mSocket?.emit("leaveRoom", data.joinToString(","))
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         })
