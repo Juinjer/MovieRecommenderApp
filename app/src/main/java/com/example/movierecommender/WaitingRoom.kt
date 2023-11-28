@@ -30,7 +30,10 @@ class WaitingRoom : AppCompatActivity() {
             binding.roomId.text = editable
         }
         mSocket?.on("hostStart") {_->
+            val b = Bundle()
+            b.putString("roomcode", binding.roomId.text.toString())
             val intent = Intent(this, SwipeScreen::class.java)
+            intent.putExtras(b)
             startActivity(intent)
         }
         binding.cancel.setOnClickListener(View.OnClickListener() {

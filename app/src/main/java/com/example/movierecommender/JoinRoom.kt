@@ -9,9 +9,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.example.movierecommender.databinding.ActivityJoinRoomBinding
 
 class JoinRoom : AppCompatActivity() {
@@ -20,7 +17,6 @@ class JoinRoom : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val endpoint = UtilsM.getEndPoint(this)
         binding = ActivityJoinRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.cancel.setOnClickListener(View.OnClickListener() {
@@ -35,8 +31,7 @@ class JoinRoom : AppCompatActivity() {
                 SocketHandler.establishConnection()
                 mSocket = SocketHandler.getSocket()
             }
-            val uid= application as UniqueID
-            val id = uid.uniqueId
+            val id= (application as UniqueID).uniqueId
             val data = listOf(roomId, id)
             mSocket?.emit("joinRoom", data.joinToString(","))
 

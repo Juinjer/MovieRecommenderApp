@@ -4,3 +4,10 @@ In this file specify:
 
 * sdk.dir=\<path/to/androidsdk\> [help](https://stackoverflow.com/questions/25176594/android-sdk-location)
 * WEBAPPENDPOINT=10.0.2.2:8080 localhost won't work because you are in an emulator, use 10.0.2.2
+
+For the backend code:
+
+```
+cd backend
+npm install
+```

@@ -53,3 +53,4 @@ obj/
 .externalNativeBuild
 
 backend/dist/*
+.env

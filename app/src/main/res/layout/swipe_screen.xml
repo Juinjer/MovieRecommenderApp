@@ -19,9 +19,11 @@
 
     <TextView
         android:id="@+id/titelText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="278dp"
+        android:layout_height="49dp"
         android:text="Film Titel"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/imageView2"
         app:layout_constraintStart_toStartOf="@+id/imageView2"
         app:layout_constraintTop_toTopOf="parent" />
@@ -52,8 +54,8 @@
 
     <TextView
         android:id="@+id/filmDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="279dp"
+        android:layout_height="131dp"
         android:text="Description: .........."
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/imageView2"
