@@ -21,19 +21,6 @@ object UtilsM {
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    fun getName(namesUsed: List<String>): String { // TODO put in server but just for testing in client
-        val templist = names.toMutableList()
-        for (i in 0..names.size) {
-            val idx = Random.nextInt(0, templist.size)
-            if (templist[idx] !in namesUsed) {
-                return templist[idx]
-            } else {
-                templist.removeAt(idx)
-            }
-        }
-        return names[0] + "1" //TODO
-    }
-
     fun getEndPoint(context: Context): String {
         val ai: ApplicationInfo = context.packageManager
             .getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)

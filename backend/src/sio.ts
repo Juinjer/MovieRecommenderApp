@@ -72,6 +72,19 @@ io.on('connection', (socket: Socket) => {
     }
   });
 
+  socket.on('startLobby', (message:string)=> {
+    console.log("started lobby")
+    const args = message.split(",");
+    for(const r of roomlist){
+      if (r.getRoomId()===parseInt(args[0])&& r.getHost()===args[1]){
+        for(const mem of r.getMembers()){
+          let sock = connections.get(mem);
+          sock?.emit("hostStart");
+        }
+      }
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });

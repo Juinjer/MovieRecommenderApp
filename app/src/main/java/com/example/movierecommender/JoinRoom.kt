@@ -30,7 +30,7 @@ class JoinRoom : AppCompatActivity() {
         binding.joinBtn.setOnClickListener(View.OnClickListener {
             val roomId = binding.roomidText.text.toString()
             var mSocket = SocketHandler.getSocket()
-            if (mSocket==null){
+            if (mSocket==null || !mSocket.connected()){
                 SocketHandler.setSocket("http://${UtilsM.getEndPoint(this)}")
                 SocketHandler.establishConnection()
                 mSocket = SocketHandler.getSocket()

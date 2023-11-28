@@ -19,6 +19,7 @@ class WaitingRoom : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility") //TODO look for a better way
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val mSocket = SocketHandler.getSocket()
 
         binding = WaitingRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -28,8 +29,11 @@ class WaitingRoom : AppCompatActivity() {
             val editable: Editable = Editable.Factory.getInstance().newEditable(s)
             binding.roomId.text = editable
         }
+        mSocket?.on("hostStart") {_->
+            val intent = Intent(this, SwipeScreen::class.java)
+            startActivity(intent)
+        }
         binding.cancel.setOnClickListener(View.OnClickListener() {
-            var mSocket = SocketHandler.getSocket()
             val id= (application as UniqueID).uniqueId
             val roomID = binding.roomId.text.toString()
             val data = listOf(roomID, id)

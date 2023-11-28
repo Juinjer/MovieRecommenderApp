@@ -31,6 +31,7 @@ class CreateRoom : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityCreateRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val mSocket= SocketHandler.getSocket()!!
 
         val b = intent.extras
         Log.d("rid", b.toString())
@@ -45,6 +46,7 @@ class CreateRoom : AppCompatActivity() {
             startActivity(intent)
         })
         binding.start.setOnClickListener(View.OnClickListener {
+            mSocket.emit("startLobby", binding.roomidnumber.text.toString())
             val intent = Intent(this, SwipeScreen::class.java)
             startActivity(intent)
         })
