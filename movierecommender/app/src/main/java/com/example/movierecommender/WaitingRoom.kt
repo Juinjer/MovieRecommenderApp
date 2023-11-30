@@ -53,7 +53,7 @@ class WaitingRoom : AppCompatActivity() {
             val s = b.getString("members")!!
             val splitted = s.split(",")
             for(st in splitted) {
-                nameList.add(Name(R.mipmap.camera_logo_foreground,st))
+                nameList.add(Name(R.drawable.camera_logo_foreground,st))
             }
         }
 

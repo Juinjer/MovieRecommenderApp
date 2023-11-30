@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainid"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/mainid"
     tools:context=".CreateRoom">
 
     <Button
@@ -58,6 +58,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="28dp"
+        android:backgroundTint="@color/mg_vandyke"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="C"
@@ -71,6 +72,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
+        android:backgroundTint="@color/mg_vandyke"
         android:text="Settings"
         app:layout_constraintStart_toStartOf="@+id/idIVQrcode"
         app:layout_constraintTop_toBottomOf="@+id/id" />
