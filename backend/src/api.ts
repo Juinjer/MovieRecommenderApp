@@ -29,7 +29,6 @@ async function requestMovie(): Promise<request.Response> {
 }
 
 export async function randomMovie() {
-	console.log(process.env.API_KEY)
 	let resp  = await requestMovie();
 	const jsonResponse = JSON.parse(String(resp));
     let img:String = jsonResponse["results"][0]["primaryImage"]["url"];
@@ -38,5 +37,3 @@ export async function randomMovie() {
 	console.log({img:img,title:title,desc:desc});
 	return {img:img,title:title,desc:desc};
 }
-
-// console.log

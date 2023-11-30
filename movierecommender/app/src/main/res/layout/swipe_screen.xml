@@ -86,8 +86,8 @@
         android:id="@+id/likeBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="#3CB93C"
         android:text="Like"
-        android:backgroundTint="#AFE1AF"
         app:layout_constraintBottom_toBottomOf="@+id/skipBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/skipBtn" />

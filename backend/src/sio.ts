@@ -54,7 +54,6 @@ io.on('connection', (socket: Socket) => {
 	});
 
 	socket.on('leaveRoom', (message: string) => {
-		console.log("TESTTTTT");
 		const args = message.split(",");
 
 		find: {
