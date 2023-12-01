@@ -5,6 +5,7 @@
     android:id="@+id/mainid"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/mg_pearl"
     tools:context=".JoinRoom">
 
     <Button
@@ -35,6 +36,7 @@
         android:layout_width="211dp"
         android:layout_height="42dp"
         android:layout_marginTop="10dp"
+        android:backgroundTint="@color/mg_vandyke"
         android:text="Join"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,13 +61,13 @@
         android:textSize="16sp"
         android:textStyle="bold"
         android:typeface="normal"
-        app:layout_constraintBottom_toTopOf="@+id/cameralogo"
+        app:layout_constraintBottom_toTopOf="@+id/icon_camera"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logo" />
 
     <ImageView
-        android:id="@+id/cameralogo"
+        android:id="@+id/icon_camera"
         android:layout_width="70dp"
         android:layout_height="70dp"
         app:layout_constraintBottom_toTopOf="@+id/cancel"
@@ -74,6 +76,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/qrscantext"
         app:layout_constraintVertical_bias="0.676"
-        app:srcCompat="@drawable/camera_logo_foreground" />
+        app:srcCompat="@drawable/icon_camera"
+        app:tint="@color/mg_vandyke" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
