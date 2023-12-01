@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="mg_pearl">#D1D3B1</color>
+    <color name="mg_pearl">#F7F8F2</color>
+    <color name="mg_peach">#FFDB99</color>
     <color name="mg_navajowhite">#FFDB99</color>
     <color name="mg_burntsienna">#E06552</color>
+    <color name="mg_coral">#DD7373</color>
     <color name="mg_cordovan">#854752</color>
+    <color name="mg_rose">#89585C</color>
     <color name="mg_vandyke">#472d30</color>
 
     <color name="purple_200">#FFBB86FC</color>
