@@ -10,4 +10,6 @@ For the backend code:
 ```
 cd backend
 npm install
+touch .env
 ```
+Paste the api key with key "API_KEY="

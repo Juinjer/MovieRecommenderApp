@@ -3,10 +3,7 @@ package com.example.movierecommender
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import com.example.movierecommender.databinding.ActivityMainBinding
 
@@ -23,8 +20,13 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        toolbar = findViewById(R.id.toolbar)
+        val toolbar:Toolbar = binding.toolbar.root
         setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            title = getString(R.string.app_name)
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
+        }
 
         binding.create.setOnClickListener(View.OnClickListener() {
             SocketHandler.setSocket("http://$endpoint")

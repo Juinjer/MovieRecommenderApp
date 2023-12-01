@@ -8,44 +8,32 @@
     android:background="@color/mg_pearl"
     tools:context=".MainActivity">
 
-    <androidx.appcompat.widget.Toolbar
+    <include
         android:id="@+id/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="115dp"
-        android:background="@color/mg_vandyke"
-        app:layout_constraintBottom_toTopOf="@+id/create"
+        layout="@layout/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleTextColor="@color/mg_pearl"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/create"
         style="@style/Widget.Material3.Button"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="36dp"
+        android:layout_width="400dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="@color/mg_vandyke"
         android:text="Create room"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/imageView4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toTopOf="@+id/toolbar" />
 
     <Button
         android:id="@+id/join"
         style="@style/Widget.Material3.Button"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="135dp"
+        android:layout_width="400dp"
+        android:layout_height="150dp"
         android:backgroundTint="@color/mg_vandyke"
         android:text="Join room"
         android:textSize="24sp"
@@ -56,9 +44,8 @@
 
     <ImageView
         android:id="@+id/imageView4"
-        android:layout_width="200dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="35dp"
+        android:layout_width="203dp"
+        android:layout_height="164dp"
         app:layout_constraintBottom_toTopOf="@+id/join"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
