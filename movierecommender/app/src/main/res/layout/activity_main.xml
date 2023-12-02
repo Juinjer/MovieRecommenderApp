@@ -21,11 +21,11 @@
         android:layout_width="400dp"
         android:layout_height="150dp"
         android:layout_marginTop="20dp"
-        android:backgroundTint="@color/mg_vandyke"
         android:text="Create room"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/imageView4"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/toolbar" />
 
@@ -34,11 +34,11 @@
         style="@style/Widget.Material3.Button"
         android:layout_width="400dp"
         android:layout_height="150dp"
-        android:backgroundTint="@color/mg_vandyke"
         android:text="Join room"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView4" />
 
