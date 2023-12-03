@@ -34,6 +34,8 @@ export async function randomMovie() {
     let img:String = jsonResponse["results"][0]["primaryImage"]["url"];
 	let title: String = jsonResponse["results"][0]["titleText"]["text"];
 	let desc: String = jsonResponse["results"][0]["plot"]["plotText"]["plainText"];
-	console.log({img:img,title:title,desc:desc});
-	return {img:img,title:title,desc:desc};
+	let id: String = jsonResponse["results"][0]["id"];
+	console.log({img:img,title:title,desc:desc,id:id});
+	return {img:img,title:title,desc:desc,id:id};
 }
+randomMovie()
