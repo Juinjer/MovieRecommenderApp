@@ -13,6 +13,10 @@ import com.example.movierecommender.databinding.SwipeScreenBinding
 import com.example.movierecommender.databinding.WaitingRoomBinding
 import com.squareup.picasso.Picasso
 import io.socket.client.Socket
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
@@ -25,13 +29,15 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
     private lateinit var gestureDetector: GestureDetector
     private val swipeThreshold = 30
     private val swipeVelocityThreshold = 50
+    private val movieBuffer = mutableListOf<Movie>()
+    private var currentMovieIndex = 0
+
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         //TODO: buffer more movies to avoid loading
         super.onCreate(savedInstanceState)
         binding = SwipeScreenBinding.inflate(layoutInflater)
-
-        // Initializing the gesture detector
         gestureDetector = GestureDetector(this, this);
 
         setContentView(binding.root)
@@ -43,22 +49,9 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
 
         id = (application as UniqueID).uniqueId
-        mSocket.emit("getMovie")
-        mSocket.on("getMovieResp"){args ->
-            runOnUiThread {
-                val img = args[0].toString()
-                val title = args[1].toString()
-                val desc = args[2].toString()
-                Log.d("img", img)
-                Log.d("title", title)
-                Log.d("desc", desc)
-                Picasso.get().load(img).into(binding.imageView2)
-                var editable: Editable = Editable.Factory.getInstance().newEditable(title)
-                binding.titelText.text = editable
-                editable = Editable.Factory.getInstance().newEditable(desc)
-                binding.filmDescription.text = editable
-            }
-        }
+
+        fetchMovie();
+
         binding.likeBtn.setOnClickListener(View.OnClickListener {
            handleLike();
         })
@@ -68,13 +61,43 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         })
     }
 
+    private fun fetchMovie(){
+        mSocket.emit("getMovie")
+        mSocket.on("getMovieResp"){args ->
+            val img = args[0].toString()
+            val title = args[1].toString()
+            val desc = args[2].toString()
+            movieBuffer.add(Movie(img,title,desc))
+            val movie = movieBuffer[currentMovieIndex++]
+            displayMovie(movie)
+        }
+    }
+
+    private fun displayMovie(movie: Movie) {
+        runOnUiThread {
+            val img = movie.img
+            val title = movie.title
+            val desc = movie.desc
+            Log.d("img", img)
+            Log.d("title", title)
+            Log.d("desc", desc)
+            Picasso.get().load(img).into(binding.imageView2)
+            var editable: Editable = Editable.Factory.getInstance().newEditable(title)
+            binding.titelText.text = editable
+            editable = Editable.Factory.getInstance().newEditable(desc)
+            binding.filmDescription.text = editable
+        }
+    }
+
     private fun handleLike(){
         //TODO: pass some filmid
         val data = listOf(roomId, id,1)
         System.out.println("Disliked")
         mSocket.emit("rateFilm", data)
-        val intent = Intent(this, SwipeScreen::class.java)
-        startActivity(intent)
+        fetchMovie()
+    }
+
+    private fun handleSkip(){
     }
 
     private fun handleDislike(){
@@ -82,8 +105,7 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         val data = listOf(roomId, id,-1)
         System.out.println("Liked")
         mSocket.emit("rateFilm", data)
-        val intent = Intent(this, SwipeScreen::class.java)
-        startActivity(intent)
+        fetchMovie()
     }
 
     // Override this method to recognize touch event
