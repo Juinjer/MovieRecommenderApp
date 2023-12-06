@@ -17,6 +17,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import kotlin.math.abs
 
 class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
@@ -50,7 +53,7 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
 
         id = (application as UniqueID).uniqueId
 
-        fetchMovie();
+        fetchMovies();
 
         binding.likeBtn.setOnClickListener(View.OnClickListener {
            handleLike();
@@ -61,31 +64,42 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         })
     }
 
-    private fun fetchMovie(){
-        mSocket.emit("getMovie")
-        mSocket.on("getMovieResp"){args ->
-            val img = args[0].toString()
-            val title = args[1].toString()
-            val desc = args[2].toString()
-            movieBuffer.add(Movie(img,title,desc))
-            val movie = movieBuffer[currentMovieIndex++]
-            displayMovie(movie)
+    private fun fetchMovies(){
+        mSocket.emit("getMovies")
+        mSocket.on("getMoviesResp") { args ->
+            val jsonArray = JSONArray(args[0].toString())
+            for (i in 0 until jsonArray.length()) {
+                val jsonObject = JSONObject(jsonArray.getString(i))
+                Log.d("movieResp args", jsonObject.toString())
+                val img = jsonObject.getString("img")
+                val title = jsonObject.getString("title")
+                val desc = jsonObject.getString("desc")
+                movieBuffer.add(Movie(img, title, desc))
+
+            }
+            val movie = movieBuffer[currentMovieIndex]
+            displayNextMovie()
         }
     }
 
-    private fun displayMovie(movie: Movie) {
-        runOnUiThread {
-            val img = movie.img
-            val title = movie.title
-            val desc = movie.desc
-            Log.d("img", img)
-            Log.d("title", title)
-            Log.d("desc", desc)
-            Picasso.get().load(img).into(binding.imageView2)
-            var editable: Editable = Editable.Factory.getInstance().newEditable(title)
-            binding.titelText.text = editable
-            editable = Editable.Factory.getInstance().newEditable(desc)
-            binding.filmDescription.text = editable
+    private fun displayNextMovie() {
+        if (currentMovieIndex < movieBuffer.size) {
+            runOnUiThread {
+                val movie = movieBuffer[currentMovieIndex++]
+                val img = movie.img
+                val title = movie.title
+                val desc = movie.desc
+                Log.d("img", img)
+                Log.d("title", title)
+                Log.d("desc", desc)
+                Picasso.get().load(img).into(binding.imageView2)
+                var editable: Editable = Editable.Factory.getInstance().newEditable(title)
+                binding.titelText.text = editable
+                editable = Editable.Factory.getInstance().newEditable(desc)
+                binding.filmDescription.text = editable
+            }
+        } else {
+            fetchMovies()
         }
     }
 
@@ -94,7 +108,7 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         val data = listOf(roomId, id,1)
         System.out.println("Disliked")
         mSocket.emit("rateFilm", data)
-        fetchMovie()
+        displayNextMovie()
     }
 
     private fun handleSkip(){
@@ -105,7 +119,7 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         val data = listOf(roomId, id,-1)
         System.out.println("Liked")
         mSocket.emit("rateFilm", data)
-        fetchMovie()
+        displayNextMovie()
     }
 
     // Override this method to recognize touch event
