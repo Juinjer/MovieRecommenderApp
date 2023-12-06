@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Colors to be referenced at other points -->
     <color name="mg_pearl">#F7F8F2</color>
     <color name="mg_peach">#FFDB99</color>
     <color name="mg_navajowhite">#FFDB99</color>
@@ -16,4 +17,16 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Suggested online to keep colors sorted in this way here
+    <color name="primary">#009688</color>
+    <color name="primary_dark">#00796B</color>
+    <color name="primary_light">#B2DFDB</color>
+    <color name="accent">#FF9800</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="icons">#FFFFFFFF</color>
+    <color name="divider">#BDBDBD</color>
+    -->
+
 </resources>
