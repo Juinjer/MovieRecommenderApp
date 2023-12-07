@@ -13,6 +13,13 @@ import com.example.movierecommender.databinding.SwipeScreenBinding
 import com.example.movierecommender.databinding.WaitingRoomBinding
 import com.squareup.picasso.Picasso
 import io.socket.client.Socket
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import kotlin.math.abs
 
 class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
@@ -27,13 +34,15 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
     private lateinit var gestureDetector: GestureDetector
     private val swipeThreshold = 30
     private val swipeVelocityThreshold = 50
+    private val movieBuffer = mutableListOf<Movie>()
+    private var currentMovieIndex = 0
+
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         //TODO: buffer more movies to avoid loading
         super.onCreate(savedInstanceState)
         binding = SwipeScreenBinding.inflate(layoutInflater)
-
-        // Initializing the gesture detector
         gestureDetector = GestureDetector(this, this);
 
         setContentView(binding.root)
@@ -57,12 +66,52 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
 
         id = (application as UniqueID).uniqueId
-        mSocket.emit("getMovie")
-        mSocket.on("getMovieResp"){args ->
+
+        fetchMovies();
+
+        binding.likeBtn.setOnClickListener(View.OnClickListener {
+           handleLike();
+        })
+
+        binding.dislikeBtn.setOnClickListener(View.OnClickListener {
+            handleDislike();
+        })
+        
+        binding.buttonTest.setOnClickListener(View.OnClickListener {
+            mSocket.emit("getSimilar")
+            mSocket.on("getSimilarResp") { args ->
+                val jsonMovies = JSONObject(args[0].toString())
+                Log.d("movie_title",jsonMovies.getString("movie_title"))
+                Log.d("recommendations", jsonMovies.getString("recommendations"))
+            }
+        })
+    }
+
+    private fun fetchMovies(){
+        mSocket.emit("getMovies")
+        mSocket.on("getMoviesResp") { args ->
+            val jsonArray = JSONArray(args[0].toString())
+            for (i in 0 until jsonArray.length()) {
+                val jsonObject = JSONObject(jsonArray.getString(i))
+                Log.d("movieResp args", jsonObject.toString())
+                val img = jsonObject.getString("img")
+                val title = jsonObject.getString("title")
+                val desc = jsonObject.getString("desc")
+                movieBuffer.add(Movie(img, title, desc))
+
+            }
+            val movie = movieBuffer[currentMovieIndex]
+            displayNextMovie()
+        }
+    }
+
+    private fun displayNextMovie() {
+        if (currentMovieIndex < movieBuffer.size) {
             runOnUiThread {
-                val img = args[0].toString()
-                val title = args[1].toString()
-                val desc = args[2].toString()
+                val movie = movieBuffer[currentMovieIndex++]
+                val img = movie.img
+                val title = movie.title
+                val desc = movie.desc
                 Log.d("img", img)
                 Log.d("title", title)
                 Log.d("desc", desc)
@@ -72,14 +121,9 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
                 editable = Editable.Factory.getInstance().newEditable(desc)
                 binding.filmDescription.text = editable
             }
+        } else {
+            fetchMovies()
         }
-        binding.likeBtn.setOnClickListener(View.OnClickListener {
-           handleLike();
-        })
-
-        binding.dislikeBtn.setOnClickListener(View.OnClickListener { ;
-            handleDislike();
-        })
     }
 
     private fun handleLike(){
@@ -92,6 +136,10 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         intent.putExtra("nSwipesDone", nSwipesDone);
         intent.putExtra("roomcode", roomId)
         startActivity(intent)
+        displayNextMovie()
+    }
+
+    private fun handleSkip(){
     }
 
     private fun handleDislike(){
@@ -104,6 +152,7 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         intent.putExtra("nSwipesDone", nSwipesDone);
         intent.putExtra("roomcode", roomId)
         startActivity(intent)
+        displayNextMovie()
     }
 
     // Override this method to recognize touch event

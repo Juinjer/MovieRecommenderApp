@@ -1,7 +1,7 @@
 import * as http from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import { Room } from './roomlogic';
-import { randomMovie } from './api';
+import { randomMovie, fetchSimilarMovies } from './api';
 
 const server = http.createServer();
 const io = new SocketIOServer(server);
@@ -118,10 +118,16 @@ io.on('connection', (socket: Socket) => {
 		}
 	});
 
-	socket.on('getMovie', async (message: String) => {
-		let movieDetails = await randomMovie()
-		socket.emit('getMovieResp', movieDetails.img,movieDetails.title,movieDetails.desc)
+	socket.on('getMovies', async () => {
+		let movieDetails = await randomMovies();
+		socket.emit('getMoviesResp', movieDetails)
 	});
+
+  socket.on('getSimilar', async(message:String) => {
+      let movies = await fetchSimilarMovies("The Lost World: Jurassic Park")
+      console.log("Similar movies", movies)
+      socket.emit('getSimilarResp', movies)
+  });
 
 	socket.on('disconnect', () => {
 		console.log('Client disconnected');
