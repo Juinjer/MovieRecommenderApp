@@ -13,6 +13,7 @@ import com.example.movierecommender.databinding.SwipeScreenBinding
 import com.example.movierecommender.databinding.WaitingRoomBinding
 import com.squareup.picasso.Picasso
 import io.socket.client.Socket
+import org.json.JSONObject
 import kotlin.math.abs
 
 class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
@@ -65,6 +66,15 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
 
         binding.dislikeBtn.setOnClickListener(View.OnClickListener { ;
             handleDislike();
+        })
+
+        binding.buttonTest.setOnClickListener(View.OnClickListener {
+            mSocket.emit("getSimilar")
+            mSocket.on("getSimilarResp") { args ->
+                val jsonMovies = JSONObject(args[0].toString())
+                Log.d("movie_title",jsonMovies.getString("movie_title"))
+                Log.d("recommendations", jsonMovies.getString("recommendations"))
+            }
         })
     }
 

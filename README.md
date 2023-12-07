@@ -13,3 +13,10 @@ npm install
 touch .env
 ```
 Paste the api key with key "API_KEY="
+
+to run python backend:
+
+
+```
+uvicorn main:app --reload
+```
