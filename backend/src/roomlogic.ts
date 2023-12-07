@@ -3,6 +3,7 @@ export class Room {
     private members: string[];
     private names: Map<string, string>;
     private roomId: number;
+    private nswipes: number;
 
     private namesOptions: string[] = [
         "Whispering Fox", "Silent Phoenix", "Mystery Hawk", "Shadowed Tiger",
@@ -16,6 +17,7 @@ export class Room {
         this.names = new Map();
         this.names.set(host, this.getName());
         this.roomId = this.generateId();
+        this.nswipes = 5;
     }
 
     addMember(member: string): void {
@@ -67,5 +69,13 @@ export class Room {
 
     getRoomId(): number {
         return this.roomId;
+    }
+
+    getNSwipes(): number {
+        return this.nswipes;
+    }
+
+    setNSwipes(n: number) {
+        this.nswipes = n;
     }
 }

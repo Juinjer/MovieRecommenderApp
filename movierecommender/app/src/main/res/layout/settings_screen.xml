@@ -13,4 +13,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <SeekBar
+        android:id="@+id/nswipes"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="238dp"
+        android:layout_height="16dp"
+        android:layout_marginTop="37dp"
+        android:layout_marginEnd="37dp"
+        android:max="10"
+        android:progress="0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsToolbar" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="98dp"
+        android:layout_height="23dp"
+        android:layout_marginEnd="7dp"
+        android:layout_marginBottom="611dp"
+        android:text="# Swipes"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/nswipes" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

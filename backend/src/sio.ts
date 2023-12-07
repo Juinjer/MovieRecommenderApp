@@ -85,6 +85,39 @@ io.on('connection', (socket: Socket) => {
 		}
 	});
 
+	socket.on('getSettings', async (message: string) => {
+		console.log("get settings", message)
+		const roomid: number = parseInt(message);
+
+		find: {
+			for (const r of roomlist) {
+				if (roomid === r.getRoomId()) {
+					console.log("getSettingsResp", r.getNSwipes().toString());
+					socket.emit("getSettingsResp", r.getNSwipes().toString());
+					break find;
+				}
+			}
+		}
+	});
+
+	socket.on('setSettings', async (message: string) => {
+		console.log("set settings", message)
+		const args = message.split(",");
+		const roomid: number = parseInt(args[0]);
+		const swipes: number = parseInt(args[1]);
+
+		find: {
+			for (const r of roomlist) {
+				if (roomid === r.getRoomId()) {
+
+					console.log(swipes);
+					r.setNSwipes(swipes);
+					break find;
+				}
+			}
+		}
+	});
+
 	socket.on('getMovie', async (message: String) => {
 		let movieDetails = await randomMovie()
 		socket.emit('getMovieResp', movieDetails.img,movieDetails.title,movieDetails.desc)

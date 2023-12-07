@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Cine Insight</string>
+    <string name="title_activity_explation_waiting_room">ExplationWaitingRoom</string>
 </resources>
