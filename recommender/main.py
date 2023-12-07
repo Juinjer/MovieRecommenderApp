@@ -10,16 +10,15 @@ async def read_root():
     return {"Hello": "World"}
 
 
-@app.post("/submitFilms/{filmids}")
-async def submit_films(filmids: str):
-    # get some recommendation from model
-    recommendation = get_recommendation(filmids)
-
-    return recommendation
+#@app.post("/submitFilms/{filmids}")
+#async def submit_films(filmids: str):
+#    # get some recommendation from model
+#    recommendation = get_recommendation(filmids)
+#   return recommendation
 
 
 # TODO: Decide whether films get passed with their title or their index
-@app.get("/simple_recommendation")
+@app.post("/simple_recommendation")
 async def get_recommendation(movie: Movie):
     similar_movies = get_similar_movies(movie.title)
     recommendations = [
@@ -30,7 +29,7 @@ async def get_recommendation(movie: Movie):
 
 
 # The explanation is the intensive part
-@app.get("/full_recommendation")
+@app.post("/full_recommendation")
 async def get_recommendation(movie: Movie):
     similar_movies = get_similar_movies(movie.title)
     explanations = get_explanation(similar_movies)
