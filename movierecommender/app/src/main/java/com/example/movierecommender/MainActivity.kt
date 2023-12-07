@@ -3,6 +3,8 @@ package com.example.movierecommender
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
@@ -31,10 +33,17 @@ class MainActivity : AppCompatActivity() {
 
         binding.create.setOnClickListener(View.OnClickListener() {
             var crIdReceived = false
+            val handler = Handler(Looper.getMainLooper())
             SocketHandler.setSocket("http://$endpoint")
             SocketHandler.establishConnection()
             val mSocket = SocketHandler.getSocket()
             mSocket?.emit("createRoom", generateID())
+
+            handler.postDelayed({
+                if (!crIdReceived) {
+                    Toast.makeText(applicationContext, "Unable to connect to server", Toast.LENGTH_SHORT).show()
+                }
+            }, 2000L) // 2 sec delay if server doesn't respond
             mSocket?.on("crId") { args ->
                 crIdReceived = true
                 val id = args[0].toString()
@@ -44,8 +53,6 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtras(b)
                 startActivity(intent)
             }
-            if(!crIdReceived)
-                Toast.makeText(applicationContext, "Unable to connect to server", Toast.LENGTH_SHORT).show()
         })
 
         binding.join.setOnClickListener(View.OnClickListener {

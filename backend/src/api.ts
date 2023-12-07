@@ -43,4 +43,17 @@ export async function randomMovies() {
     }
     console.log(jsonArray.toString())
     return jsonArray;
+
+export async function fetchSimilarMovies(movieTitle: string) {
+  const response = await fetch('http://localhost:8000/simple_recommendation', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({"title": movieTitle }),
+  });
+
+  const movies = await response.json();
+  console.log(movies)
+  return movies;
 }

@@ -59,8 +59,17 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
            handleLike();
         })
 
-        binding.dislikeBtn.setOnClickListener(View.OnClickListener { ;
+        binding.dislikeBtn.setOnClickListener(View.OnClickListener {
             handleDislike();
+        })
+        
+        binding.buttonTest.setOnClickListener(View.OnClickListener {
+            mSocket.emit("getSimilar")
+            mSocket.on("getSimilarResp") { args ->
+                val jsonMovies = JSONObject(args[0].toString())
+                Log.d("movie_title",jsonMovies.getString("movie_title"))
+                Log.d("recommendations", jsonMovies.getString("recommendations"))
+            }
         })
     }
 
