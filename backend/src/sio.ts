@@ -1,7 +1,7 @@
 import * as http from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import { Room } from './roomlogic';
-import { randomMovie, fetchSimilarMovies } from './api';
+import { randomMovies, fetchSimilarMovies } from './api';
 
 const server = http.createServer();
 const io = new SocketIOServer(server);

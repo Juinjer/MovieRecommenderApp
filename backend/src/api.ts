@@ -1,6 +1,17 @@
 import * as request from 'request';
 require('dotenv').config();
 
+let numberOfMovies = 10;  // Set the desired number of movies
+
+const options: request.Options = {
+  method: 'GET',
+  url: `http://localhost:8000/random/${numberOfMovies}`,
+  headers: {
+    // Add any headers you might need for your FastAPI server
+  }
+};
+
+/*
 const options: request.Options = {
   method: 'GET',
   url: 'https://moviesdatabase.p.rapidapi.com/titles/random',
@@ -15,8 +26,11 @@ const options: request.Options = {
     'X-RapidAPI-Host': 'moviesdatabase.p.rapidapi.com'
   }
 };
+*/
 
-async function requestMovies(): Promise<request.Response> {
+
+
+async function requestRandomMovies(): Promise<request.Response> {
 	return new Promise((resolve, reject) => {
 		request(options, (error, response, body) => {
 			if (error) {
@@ -29,20 +43,29 @@ async function requestMovies(): Promise<request.Response> {
 }
 
 export async function randomMovies() {
-    let resp  = await requestMovies();
+	let resp  = await requestRandomMovies();
     const jsonResponse = JSON.parse(String(resp));
+    console.log(jsonResponse)
     const jsonArray = [];
 
-    for(let i = 0;  i < jsonResponse["results"].length; i++){
-        let img:String = jsonResponse["results"][i]["primaryImage"]["url"];
-        let title: String = jsonResponse["results"][i]["titleText"]["text"];
-        let desc: String = jsonResponse["results"][i]["plot"]["plotText"]["plainText"];
+     for (let i = 0; i < jsonResponse.movies.length; i++) {
+        const movie = jsonResponse.movies[i];
+        const img = movie.full_poster_path;
+        const title = movie.title;
+        const desc = movie.overview;
 
-        const jsonStringMovie = JSON.stringify({img: img, title: title, desc: desc,});
-        jsonArray.push(jsonStringMovie);
+        const movieObject = {
+            img: img,
+            title: title,
+            desc: desc,
+        };
+        jsonArray.push(movieObject);
     }
-    console.log(jsonArray.toString())
+
+    // Print or use jsonArray as needed
+    console.log(jsonArray);
     return jsonArray;
+}
 
 export async function fetchSimilarMovies(movieTitle: string) {
   const response = await fetch('http://localhost:8000/simple_recommendation', {

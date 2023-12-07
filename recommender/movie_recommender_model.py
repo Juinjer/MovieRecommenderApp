@@ -1,7 +1,8 @@
+import random
+import lime
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.neighbors import NearestNeighbors
-import lime
 from lime.lime_text import LimeTextExplainer
 
 pd.set_option('display.max_colwidth', None)
@@ -14,6 +15,12 @@ print(tfidf_matrix.shape)
 model = NearestNeighbors(metric='cosine')
 model.fit(tfidf_matrix)
 
+
+def get_random_movies(number_of_movies):
+    random_movie_indices = random.sample(range(len(df)), number_of_movies)
+    random_movies = df.iloc[random_movie_indices]
+
+    return random_movies
 
 def get_similar_movies(movie_title, k=5):
     movie_index = df[df['title'] == movie_title].index[0]
@@ -31,6 +38,7 @@ def get_explanation(similar_movies):
     for i in range(len(similar_movies)):
         print(f'Similar movie #{i + 1}: {similar_movies["title"].iloc[i]}')
         movie_overview = similar_movies['overview'].iloc[i]
+        poster_link = similar_movies['full_poster_path'].iloc[i]
         explanation = explainer.explain_instance(
             movie_overview, predict_similarity, num_features=10)
         # explanation.show_in_notebook()

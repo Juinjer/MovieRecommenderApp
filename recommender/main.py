@@ -1,6 +1,10 @@
+import logging
 from fastapi import FastAPI
-from movie_recommender_model import get_similar_movies, get_explanation
+import movie_recommender_model as model
 from models import Movie
+
+# Add the base URL for poster images
+base_poster_url = 'https://image.tmdb.org/t/p/original/'
 
 app = FastAPI()
 
@@ -10,39 +14,58 @@ async def read_root():
     return {"Hello": "World"}
 
 
-#@app.post("/submitFilms/{filmids}")
-#async def submit_films(filmids: str):
-#    # get some recommendation from model
-#    recommendation = get_recommendation(filmids)
-#   return recommendation
+@app.get("/random/{number_of_movies}")
+async def get_random_movies(number_of_movies: int):
+    random_movies = model.get_random_movies(number_of_movies)
+
+    suggestions = [
+        {
+            "index": index,
+            "title": title,
+            "overview": overview,
+            "full_poster_path": base_poster_url + poster_path
+        }
+        for index, (title, overview, poster_path) in random_movies[['title', 'overview', 'poster_path']].iterrows()
+    ]
+    #    logging.info({"movie_title": movie.title, "recommendations": recommendations})
+    return {"movies": suggestions}
 
 
 # TODO: Decide whether films get passed with their title or their index
 @app.post("/simple_recommendation")
 async def get_recommendation(movie: Movie):
-    similar_movies = get_similar_movies(movie.title)
+    similar_movies = model.get_similar_movies(movie.title)
     recommendations = [
-        {"index": index, "title": title, "overview": overview}
-        for index, (title, overview) in similar_movies[['title', 'overview']].iterrows()
+        {
+            "index": index,
+            "title": title,
+            "overview": overview,
+            "full_poster_path": base_poster_url + poster_path
+        }
+        for index, (title, overview, poster_path) in similar_movies[['title', 'overview', 'poster_path']].iterrows()
     ]
+    #    logging.info({"movie_title": movie.title, "recommendations": recommendations})
     return {"movie_title": movie.title, "recommendations": recommendations}
 
 
 # The explanation is the intensive part
 @app.post("/full_recommendation")
 async def get_recommendation(movie: Movie):
-    similar_movies = get_similar_movies(movie.title)
-    explanations = get_explanation(similar_movies)
+    similar_movies = model.get_similar_movies(movie.title)
+    explanations = model.get_explanation(similar_movies)
     recommendations = []
 
-    for index, (title, overview), explanation in zip(similar_movies.index,
-                                                     similar_movies[['title', 'overview']].itertuples(index=False,
-                                                                                                      name=None),
-                                                     explanations):
+    for index, (title, overview, poster_path), explanation in zip(similar_movies.index,
+                                                                  similar_movies[
+                                                                      ['title', 'overview', 'poster_path']].itertuples(
+                                                                      index=False,
+                                                                      name=None),
+                                                                  explanations):
         recommendations.append({
             "index": index,
             "title": title,
             "overview": overview,
+            "full_poster_path": base_poster_url + poster_path,
             "explanation": explanation
         })
     return {"movie_title": movie.title, "recommendations": recommendations}
