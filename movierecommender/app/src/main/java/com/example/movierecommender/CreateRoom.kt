@@ -41,25 +41,26 @@ class CreateRoom : AppCompatActivity() {
             binding.roomidnumber.text = editable
         }
 
+        val roomId = binding.roomidnumber.text.toString()
+        val id = (application as UniqueID).uniqueId
+        val data = listOf(roomId, id)
+        b?.putString("roomcode", roomId)
+        mSocket.emit("startLobby", data.joinToString(","))
+
         binding.cancel.setOnClickListener(View.OnClickListener() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         })
+
         binding.start.setOnClickListener(View.OnClickListener {
-            val roomId = binding.roomidnumber.text.toString()
-            val id = (application as UniqueID).uniqueId
-            val data = listOf(roomId, id)
-            val b = Bundle()
-            b.putString("roomcode", roomId)
-
-            mSocket.emit("startLobby", data.joinToString(","))
-
             val intent = Intent(this, SwipeScreen::class.java)
-            intent.putExtras(b)
+            intent.putExtra("roomcode", roomId)
             startActivity(intent)
         })
+
         binding.settings.setOnClickListener(View.OnClickListener {
             val intent = Intent(this,SettingsScreen::class.java)
+            intent.putExtra("roomcode", roomId)
             startActivity(intent)
         })
 

@@ -28,6 +28,8 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
     private lateinit var id:String
     private lateinit var mSocket: Socket
 
+    private var nSwipesDone = 0;
+
     // Declaring gesture detector, swipe threshold, and swipe velocity threshold
     private lateinit var gestureDetector: GestureDetector
     private val swipeThreshold = 30
@@ -49,6 +51,18 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         roomId = "404"
         if (b != null) {
             roomId = b.getString("roomcode")!!
+        }
+
+        nSwipesDone = intent.getIntExtra("nSwipesDone", 0);
+
+        mSocket.emit("getSettings", roomId)
+        mSocket.on("getSettingsResp"){ args ->
+            val result = Integer.parseInt(args[0].toString());
+
+            if (result == nSwipesDone) {
+                val intent = Intent(this, ExplationWaitingRoom::class.java)
+                startActivity(intent)
+            }
         }
 
         id = (application as UniqueID).uniqueId
@@ -117,6 +131,11 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         val data = listOf(roomId, id,1)
         System.out.println("Disliked")
         mSocket.emit("rateFilm", data)
+        val intent = Intent(this, SwipeScreen::class.java)
+        nSwipesDone++;
+        intent.putExtra("nSwipesDone", nSwipesDone);
+        intent.putExtra("roomcode", roomId)
+        startActivity(intent)
         displayNextMovie()
     }
 
@@ -128,6 +147,11 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         val data = listOf(roomId, id,-1)
         System.out.println("Liked")
         mSocket.emit("rateFilm", data)
+        val intent = Intent(this, SwipeScreen::class.java)
+        nSwipesDone++;
+        intent.putExtra("nSwipesDone", nSwipesDone);
+        intent.putExtra("roomcode", roomId)
+        startActivity(intent)
         displayNextMovie()
     }
 
