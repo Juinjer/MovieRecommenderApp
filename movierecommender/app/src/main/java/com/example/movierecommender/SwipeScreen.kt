@@ -13,6 +13,12 @@ import com.example.movierecommender.databinding.SwipeScreenBinding
 import com.example.movierecommender.databinding.WaitingRoomBinding
 import com.squareup.picasso.Picasso
 import io.socket.client.Socket
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import kotlin.math.abs
 
@@ -26,13 +32,15 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
     private lateinit var gestureDetector: GestureDetector
     private val swipeThreshold = 30
     private val swipeVelocityThreshold = 50
+    private val movieBuffer = mutableListOf<Movie>()
+    private var currentMovieIndex = 0
+
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         //TODO: buffer more movies to avoid loading
         super.onCreate(savedInstanceState)
         binding = SwipeScreenBinding.inflate(layoutInflater)
-
-        // Initializing the gesture detector
         gestureDetector = GestureDetector(this, this);
 
         setContentView(binding.root)
@@ -44,30 +52,17 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
 
         id = (application as UniqueID).uniqueId
-        mSocket.emit("getMovie")
-        mSocket.on("getMovieResp"){args ->
-            runOnUiThread {
-                val img = args[0].toString()
-                val title = args[1].toString()
-                val desc = args[2].toString()
-                Log.d("img", img)
-                Log.d("title", title)
-                Log.d("desc", desc)
-                Picasso.get().load(img).into(binding.imageView2)
-                var editable: Editable = Editable.Factory.getInstance().newEditable(title)
-                binding.titelText.text = editable
-                editable = Editable.Factory.getInstance().newEditable(desc)
-                binding.filmDescription.text = editable
-            }
-        }
+
+        fetchMovies();
+
         binding.likeBtn.setOnClickListener(View.OnClickListener {
            handleLike();
         })
 
-        binding.dislikeBtn.setOnClickListener(View.OnClickListener { ;
+        binding.dislikeBtn.setOnClickListener(View.OnClickListener {
             handleDislike();
         })
-
+        
         binding.buttonTest.setOnClickListener(View.OnClickListener {
             mSocket.emit("getSimilar")
             mSocket.on("getSimilarResp") { args ->
@@ -78,13 +73,54 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         })
     }
 
+    private fun fetchMovies(){
+        mSocket.emit("getMovies")
+        mSocket.on("getMoviesResp") { args ->
+            val jsonArray = JSONArray(args[0].toString())
+            for (i in 0 until jsonArray.length()) {
+                val jsonObject = JSONObject(jsonArray.getString(i))
+                Log.d("movieResp args", jsonObject.toString())
+                val img = jsonObject.getString("img")
+                val title = jsonObject.getString("title")
+                val desc = jsonObject.getString("desc")
+                movieBuffer.add(Movie(img, title, desc))
+
+            }
+            val movie = movieBuffer[currentMovieIndex]
+            displayNextMovie()
+        }
+    }
+
+    private fun displayNextMovie() {
+        if (currentMovieIndex < movieBuffer.size) {
+            runOnUiThread {
+                val movie = movieBuffer[currentMovieIndex++]
+                val img = movie.img
+                val title = movie.title
+                val desc = movie.desc
+                Log.d("img", img)
+                Log.d("title", title)
+                Log.d("desc", desc)
+                Picasso.get().load(img).into(binding.imageView2)
+                var editable: Editable = Editable.Factory.getInstance().newEditable(title)
+                binding.titelText.text = editable
+                editable = Editable.Factory.getInstance().newEditable(desc)
+                binding.filmDescription.text = editable
+            }
+        } else {
+            fetchMovies()
+        }
+    }
+
     private fun handleLike(){
         //TODO: pass some filmid
         val data = listOf(roomId, id,1)
         System.out.println("Disliked")
         mSocket.emit("rateFilm", data)
-        val intent = Intent(this, SwipeScreen::class.java)
-        startActivity(intent)
+        displayNextMovie()
+    }
+
+    private fun handleSkip(){
     }
 
     private fun handleDislike(){
@@ -92,8 +128,7 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         val data = listOf(roomId, id,-1)
         System.out.println("Liked")
         mSocket.emit("rateFilm", data)
-        val intent = Intent(this, SwipeScreen::class.java)
-        startActivity(intent)
+        displayNextMovie()
     }
 
     // Override this method to recognize touch event

@@ -16,7 +16,7 @@ const options: request.Options = {
   }
 };
 
-async function requestMovie(): Promise<request.Response> {
+async function requestMovies(): Promise<request.Response> {
 	return new Promise((resolve, reject) => {
 		request(options, (error, response, body) => {
 			if (error) {
@@ -28,16 +28,21 @@ async function requestMovie(): Promise<request.Response> {
 	});
 }
 
-export async function randomMovie() {
-	let resp  = await requestMovie();
-	const jsonResponse = JSON.parse(String(resp));
-    let img:String = jsonResponse["results"][0]["primaryImage"]["url"];
-	let title: String = jsonResponse["results"][0]["titleText"]["text"];
-	let desc: String = jsonResponse["results"][0]["plot"]["plotText"]["plainText"];
-	let id: String = jsonResponse["results"][0]["id"];
-	console.log({img:img,title:title,desc:desc,id:id});
-	return {img:img,title:title,desc:desc,id:id};
-}
+export async function randomMovies() {
+    let resp  = await requestMovies();
+    const jsonResponse = JSON.parse(String(resp));
+    const jsonArray = [];
+
+    for(let i = 0;  i < jsonResponse["results"].length; i++){
+        let img:String = jsonResponse["results"][i]["primaryImage"]["url"];
+        let title: String = jsonResponse["results"][i]["titleText"]["text"];
+        let desc: String = jsonResponse["results"][i]["plot"]["plotText"]["plainText"];
+
+        const jsonStringMovie = JSON.stringify({img: img, title: title, desc: desc,});
+        jsonArray.push(jsonStringMovie);
+    }
+    console.log(jsonArray.toString())
+    return jsonArray;
 
 export async function fetchSimilarMovies(movieTitle: string) {
   const response = await fetch('http://localhost:8000/simple_recommendation', {
