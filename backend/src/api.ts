@@ -1,15 +1,6 @@
 import * as request from 'request';
+import { getRandomPositiveRated } from './ratinglogic'
 require('dotenv').config();
-
-let numberOfMovies = 10;  // Set the desired number of movies
-
-const options: request.Options = {
-  method: 'GET',
-  url: `http://localhost:8000/random/${numberOfMovies}`,
-  headers: {
-    // Add any headers you might need for your FastAPI server
-  }
-};
 
 /*
 const options: request.Options = {
@@ -28,28 +19,31 @@ const options: request.Options = {
 };
 */
 
-
-
-async function requestRandomMovies(): Promise<request.Response> {
-	return new Promise((resolve, reject) => {
-		request(options, (error, response, body) => {
-			if (error) {
-				reject(error);
-			} else {
-				resolve(body);
-			}
-		});
+const
+async function requestRandomMovies(): Promise<request.Response>{
+    return new Promise((resolve, reject) => {
+            request(options, (error, response, body) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(body);
+                }
+            });
 	});
 }
 
-export async function randomMovies() {
-	let resp  = await requestRandomMovies();
-    const jsonResponse = JSON.parse(String(resp));
-    console.log(jsonResponse)
+
+export async function getRandomMovies(numberOfMovies: number) {
+    const response = await fetch(`http://localhost:8000/random/${numberOfMovies}`, {
+        method: 'GET',
+    });
+
+    const randomMoviesJSON = await response.json();
+    console.log(randomMoviesJSON)
     const jsonArray = [];
 
-     for (let i = 0; i < jsonResponse.movies.length; i++) {
-        const movie = jsonResponse.movies[i];
+    for (let i = 0; i < randomMoviesJSON.movies.length; i++) {
+        const movie = randomMoviesJSON.movies[i];
         const img = movie.full_poster_path;
         const title = movie.title;
         const desc = movie.overview;
@@ -67,16 +61,33 @@ export async function randomMovies() {
     return jsonArray;
 }
 
-export async function fetchSimilarMovies(movieTitle: string) {
-  const response = await fetch('http://localhost:8000/simple_recommendation', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({"title": movieTitle }),
-  });
+export async function fetchSimilarMovies(appId: string) {
+    const movieTitle = await getRandomPositiveRated(appId);
 
-  const movies = await response.json();
-  console.log(movies)
-  return movies;
+    const response = await fetch('http://localhost:8000/simple_recommendation', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"title": movieTitle }),
+    });
+
+    const similarMoviesJSON = await response.json();
+    console.log(similarMoviesJSON)
+    return similarMoviesJSON;
+}
+
+export async function getFullRecommendation(appId:string){
+    const movieTitle = await getRandomPositiveRated(appId);
+
+    const response = await fetch('http://localhost:8000/full_recommendation', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"title": movieTitle }),
+    });
+    const fullRecommendationJSON = await response.json();
+    console.log(fullRecommendationJSON)
+    return fullRecommendationJSON;
 }

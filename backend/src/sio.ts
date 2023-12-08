@@ -1,7 +1,9 @@
 import * as http from 'http';
+import { handleMovieRating } from './ratinglogic'
+import { RateFilmData } from './interfaces';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import { Room } from './roomlogic';
-import { randomMovies, fetchSimilarMovies } from './api';
+import { getRandomMovies, fetchSimilarMovies, getFullRecommendation} from './api';
 
 const server = http.createServer();
 const io = new SocketIOServer(server);
@@ -87,11 +89,11 @@ io.on('connection', (socket: Socket) => {
 
 	socket.on('getSettings', async (message: string) => {
 		console.log("get settings", message)
-		const roomid: number = parseInt(message);
+		const roomId: number = parseInt(message);
 
 		find: {
 			for (const r of roomlist) {
-				if (roomid === r.getRoomId()) {
+				if (roomId === r.getRoomId()) {
 					console.log("getSettingsResp", r.getNSwipes().toString());
 					socket.emit("getSettingsResp", r.getNSwipes().toString());
 					break find;
@@ -103,12 +105,12 @@ io.on('connection', (socket: Socket) => {
 	socket.on('setSettings', async (message: string) => {
 		console.log("set settings", message)
 		const args = message.split(",");
-		const roomid: number = parseInt(args[0]);
+		const roomId: number = parseInt(args[0]);
 		const swipes: number = parseInt(args[1]);
 
 		find: {
 			for (const r of roomlist) {
-				if (roomid === r.getRoomId()) {
+				if (roomId === r.getRoomId()) {
 
 					console.log(swipes);
 					r.setNSwipes(swipes);
@@ -118,20 +120,38 @@ io.on('connection', (socket: Socket) => {
 		}
 	});
 
-	socket.on('getMovies', async () => {
-		let movieDetails = await randomMovies();
-		socket.emit('getMoviesResp', movieDetails)
-	});
+    socket.on('getMovies', async (numberOfMovies: number) => {
+        let movieDetails = await getRandomMovies(numberOfMovies);
+        socket.emit('getMoviesResp', movieDetails);
+    });
 
-  socket.on('getSimilar', async(message:String) => {
-      let movies = await fetchSimilarMovies("The Lost World: Jurassic Park")
-      console.log("Similar movies", movies)
-      socket.emit('getSimilarResp', movies)
-  });
+    socket.on('rateFilm', async (data:string) =>{
+        const args = data.split(",");
+        const roomId: string = args[0];
+        const appId: string = args[1];
+        const movieTitle: string = args[2];
+        const rating: number = parseInt(args[3]);
+
+        const rateFilmData: RateFilmData = {
+            roomId,
+            appId,
+            movieTitle,
+            rating,
+        };
+
+        console.log("App id ", appId);
+        handleMovieRating(rateFilmData);
+    });
+
+    socket.on('getSimilar', async(appId:string) => {
+        let movies = await getFullRecommendation(appId);
+        console.log("Similar movies", movies);
+        socket.emit('getSimilarResp', movies);
+    });
 
 	socket.on('disconnect', () => {
-		console.log('Client disconnected');
-	});
+        console.log('Client disconnected');
+    });
 });
 
 server.listen(8080, () => {
