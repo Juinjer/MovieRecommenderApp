@@ -104,39 +104,9 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
                 binding.filmDescription.text = editable
             }
         } else {
-            if(currentMovieIndex == swipesThreshold) {
-                mSocket.emit("getSimilar", id)
-                mSocket.on("getSimilarResp") { args ->
-                    val jsonMovies = JSONObject(args[0].toString())
-                    Log.d("movie_title",jsonMovies.getString("movie_title"))
-                    Log.d("recommendations", jsonMovies.getString("recommendations"))
-                    showRecommendation(jsonMovies)
-                }
-                val handler = Handler(Looper.getMainLooper())
-                handler.postDelayed({
-                    // This delay serves no function and is here only to keep the app from crashing untill everybody has read the recommendation
-                }, 30000) // 30 seconds in milliseconds
-                //showExplanationScreen()
-            } else {
-                fetchMovies(swipesThreshold-currentMovieIndex)
+            if (currentMovieIndex == swipesThreshold) {
+                showExplanationScreen()
             }
-        }
-    }
-
-    private fun showRecommendation(jsonMovies: JSONObject) {
-        runOnUiThread {
-            val movie = movieBuffer[currentMovieIndex++]
-            val img = movie.img
-            val title = movie.title
-            val desc = movie.desc
-            Log.d("img", img)
-            Log.d("title", title)
-            Log.d("desc", desc)
-            Picasso.get().load(img).into(binding.imageView2)
-            var editable: Editable = Editable.Factory.getInstance().newEditable(title)
-            binding.titelText.text = editable
-            editable = Editable.Factory.getInstance().newEditable(desc)
-            binding.filmDescription.text = editable
         }
     }
 
@@ -192,21 +162,21 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
             if (abs(diffX) > abs(diffY)) {
                 if (abs(diffX) > flingThreshold && abs(velocityX) > flingVelocityThreshold) {
                     if (diffX > 0) {
-                        Toast.makeText(applicationContext, "Left to Right swipe gesture", Toast.LENGTH_SHORT).show()
+                        // Toast.makeText(applicationContext, "Left to Right swipe gesture", Toast.LENGTH_SHORT).show()
                         handleLike()
                     }
                     else {
-                        Toast.makeText(applicationContext, "Right to Left swipe gesture", Toast.LENGTH_SHORT).show()
+                        // Toast.makeText(applicationContext, "Right to Left swipe gesture", Toast.LENGTH_SHORT).show()
                         handleDislike()
                     }
                 }
             }else{
                 if (abs(diffY) > flingThreshold && abs(velocityY) > flingVelocityThreshold) {
                     if (diffY > 0) {
-                        Toast.makeText(applicationContext, "Up to Down gesture", Toast.LENGTH_SHORT).show()
+                        // Toast.makeText(applicationContext, "Up to Down gesture", Toast.LENGTH_SHORT).show()
                     }
                     else {
-                        Toast.makeText(applicationContext, "Down to Up swipe gesture", Toast.LENGTH_SHORT).show()
+                        // Toast.makeText(applicationContext, "Down to Up swipe gesture", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
