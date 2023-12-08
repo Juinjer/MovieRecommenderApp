@@ -17,9 +17,7 @@ const options: request.Options = {
     'X-RapidAPI-Host': 'moviesdatabase.p.rapidapi.com'
   }
 };
-*/
 
-const
 async function requestRandomMovies(): Promise<request.Response>{
     return new Promise((resolve, reject) => {
             request(options, (error, response, body) => {
@@ -32,6 +30,7 @@ async function requestRandomMovies(): Promise<request.Response>{
 	});
 }
 
+*/
 
 export async function getRandomMovies(numberOfMovies: number) {
     const response = await fetch(`http://localhost:8000/random/${numberOfMovies}`, {
