@@ -33,7 +33,7 @@ async def get_random_movies(number_of_movies: int):
 
 # TODO: Decide whether films get passed with their title or their index
 @app.post("/simple_recommendation")
-async def get_recommendation(movie: Movie):
+async def get_simple_recommendation(movie: Movie):
     similar_movies = model.get_similar_movies(movie.title)
     recommendations = [
         {
@@ -50,7 +50,7 @@ async def get_recommendation(movie: Movie):
 
 # The explanation is the intensive part
 @app.post("/full_recommendation")
-async def get_recommendation(movie: Movie):
+async def get_full_recommendation(movie: Movie):
     similar_movies = model.get_similar_movies(movie.title)
     explanations = model.get_explanation(similar_movies)
     recommendations = []
@@ -69,3 +69,6 @@ async def get_recommendation(movie: Movie):
             "explanation": explanation
         })
     return {"movie_title": movie.title, "recommendations": recommendations}
+
+# @app.post("/send_likes")
+# async def add_likes( like: UserLike):

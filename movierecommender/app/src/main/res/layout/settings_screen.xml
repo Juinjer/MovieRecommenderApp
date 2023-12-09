@@ -10,29 +10,49 @@
         android:id="@+id/settingsToolbar"
         layout="@layout/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <SeekBar
-        android:id="@+id/nswipes"
+        android:id="@+id/sbSwipesThreshold"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
-        android:layout_width="238dp"
-        android:layout_height="16dp"
-        android:layout_marginTop="37dp"
-        android:layout_marginEnd="37dp"
-        android:max="10"
-        android:progress="0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="36dp"
+        android:max="7"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settingsToolbar" />
+        app:layout_constraintHeight_percent="0.05"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvExplanationSwipes"
+        app:layout_constraintWidth_percent="0.8" />
 
     <TextView
-        android:id="@+id/textView3"
-        android:layout_width="98dp"
-        android:layout_height="23dp"
-        android:layout_marginEnd="7dp"
-        android:layout_marginBottom="611dp"
-        android:text="# Swipes"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/nswipes" />
+        android:id="@+id/tvExplanationSwipes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="96dp"
+        android:text="Amount of swipes until recommendation:"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvSwipeThreshold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="5"
+        android:textColor="@color/black"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/tvExplanationSwipes"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvExplanationSwipes"
+        app:layout_constraintTop_toTopOf="@+id/tvExplanationSwipes" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
