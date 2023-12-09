@@ -4,6 +4,7 @@ import { RateFilmData } from './interfaces';
 const ratingsMap = new Map<string, { positive: RateFilmData[], negative: RateFilmData[] }>();
 
 export async function handleMovieRating(movieRating: RateFilmData) {
+    //movieRatingJSON = JSON.stringify(movieRating);
     const { roomId, appId, movieTitle, rating } = movieRating;
 
     // Ensure the appId exists in the map

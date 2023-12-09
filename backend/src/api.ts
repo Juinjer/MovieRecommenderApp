@@ -1,36 +1,5 @@
 import * as request from 'request';
 import { getRandomPositiveRated } from './ratinglogic'
-require('dotenv').config();
-
-/*
-const options: request.Options = {
-  method: 'GET',
-  url: 'https://moviesdatabase.p.rapidapi.com/titles/random',
-  qs: {
-    list: 'top_rated_english_250',
-    titleType: 'movie',
-    startYear: '2000',
-	info: 'base_info'
-  },
-  headers: {
-    'X-RapidAPI-Key': process.env.API_KEY,
-    'X-RapidAPI-Host': 'moviesdatabase.p.rapidapi.com'
-  }
-};
-
-async function requestRandomMovies(): Promise<request.Response>{
-    return new Promise((resolve, reject) => {
-            request(options, (error, response, body) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(body);
-                }
-            });
-	});
-}
-
-*/
 
 export async function getRandomMovies(numberOfMovies: number) {
     const response = await fetch(`http://localhost:8000/random/${numberOfMovies}`, {
@@ -60,7 +29,7 @@ export async function getRandomMovies(numberOfMovies: number) {
     return jsonArray;
 }
 
-export async function fetchSimilarMovies(appId: string) {
+export async function getSimpleRecommendation(appId: string) {
     const movieTitle = await getRandomPositiveRated(appId);
 
     const response = await fetch('http://localhost:8000/simple_recommendation', {

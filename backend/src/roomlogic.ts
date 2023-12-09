@@ -1,9 +1,13 @@
+import { RateFilmData} from './interfaces'
+
 export class Room {
     private host: string;
+    private roomId: number;
     private members: string[];
     private names: Map<string, string>;
-    private roomId: number;
-    private nswipes: number;
+    private numberOfRecommendations: number;
+    private numberOfSwipes: number;
+    private movieRatings: Map<String, RateFilmData>
 
     private namesOptions: string[] = [
         "Whispering Fox", "Silent Phoenix", "Mystery Hawk", "Shadowed Tiger",
@@ -12,12 +16,16 @@ export class Room {
     ];
 
     constructor(host: string) {
+        this.roomId = this.generateId();
         this.host = host;
         this.members = [host];
+
         this.names = new Map();
         this.names.set(host, this.getName());
-        this.roomId = this.generateId();
-        this.nswipes = 5;
+        this.movieRatings = new Map();
+        
+        this.numberOfRecommendations = 5;
+        this.numberOfSwipes = 3;
     }
 
     addMember(member: string): void {
@@ -72,10 +80,10 @@ export class Room {
     }
 
     getNSwipes(): number {
-        return this.nswipes;
+        return this.numberOfSwipes;
     }
 
     setNSwipes(n: number) {
-        this.nswipes = n;
+        this.numberOfSwipes = n;
     }
 }
