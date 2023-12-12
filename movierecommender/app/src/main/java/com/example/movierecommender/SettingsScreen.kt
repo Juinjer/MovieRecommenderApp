@@ -14,7 +14,6 @@ import java.lang.Integer.parseInt
 class SettingsScreen : AppCompatActivity() {
 
     private lateinit var binding: SettingsScreenBinding
-
     private lateinit var mSocket: Socket
     private lateinit var roomId: String
     private var nSwipes: Int = 5
@@ -23,9 +22,9 @@ class SettingsScreen : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = SettingsScreenBinding.inflate(layoutInflater)
-        mSocket= SocketHandler.getSocket()!!
+        mSocket = SocketHandler.getSocket()!!
         setContentView(binding.root)
-        val toolbar:Toolbar = binding.settingsToolbar.root
+        val toolbar: Toolbar = binding.settingsToolbar.root
         setSupportActionBar(toolbar)
 
         val b = intent.extras
@@ -40,7 +39,8 @@ class SettingsScreen : AppCompatActivity() {
         binding.sbSwipesThreshold.max = 10;
         binding.sbSwipesThreshold.progress = nSwipes;
 
-        binding.sbSwipesThreshold.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.sbSwipesThreshold.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 // Update TextView content as the SeekBar progresses
                 binding.tvSwipeThreshold.text = "$progress"
@@ -71,16 +71,16 @@ class SettingsScreen : AppCompatActivity() {
         super.onBackPressed()
     }
 
-    private fun setSettings(){
+    private fun setSettings() {
         Log.d("SettingsScreen", "SetSettings")
         mSocket.emit("setSettings", "$roomId,$nSwipes");
     }
 
-    private fun getSettings(){
+    private fun getSettings() {
         Log.d("SettingsScreen", "GetSettings")
         mSocket.emit("getSettings", roomId)
-        mSocket.on("getSettingsResp"){args ->
-            nSwipes =  parseInt(args[0].toString());
+        mSocket.on("getSettingsResp") { args ->
+            nSwipes = parseInt(args[0].toString());
             binding.sbSwipesThreshold.progress = nSwipes;
         }
     }

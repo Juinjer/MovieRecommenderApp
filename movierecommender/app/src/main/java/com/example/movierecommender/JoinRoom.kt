@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.widget.Toolbar
 import com.example.movierecommender.databinding.ActivityJoinRoomBinding
 
 class JoinRoom : AppCompatActivity() {
@@ -19,6 +20,15 @@ class JoinRoom : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityJoinRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val toolbar: Toolbar = binding.joinRoomToolbar.root
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            title = getString(R.string.app_name)
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
+        }
+
         binding.cancel.setOnClickListener(View.OnClickListener() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
@@ -26,16 +36,16 @@ class JoinRoom : AppCompatActivity() {
         binding.joinBtn.setOnClickListener(View.OnClickListener {
             val roomId = binding.roomidText.text.toString()
             var mSocket = SocketHandler.getSocket()
-            if (mSocket==null || !mSocket.connected()){
+            if (mSocket == null || !mSocket.connected()) {
                 SocketHandler.setSocket("http://${UtilsM.getEndPoint(this)}")
                 SocketHandler.establishConnection()
                 mSocket = SocketHandler.getSocket()
             }
-            val id= (application as UniqueID).uniqueId
+            val id = (application as UniqueID).uniqueId
             val data = listOf(roomId, id)
             mSocket?.emit("joinRoom", data.joinToString(","))
 
-            mSocket?.on("jrRes"){args ->
+            mSocket?.on("jrRes") { args ->
                 val b = Bundle()
                 b.putString("members", args[0].toString())
                 b.putString("roomcode", args[1].toString())
