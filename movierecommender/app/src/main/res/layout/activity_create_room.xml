@@ -7,11 +7,17 @@
     android:layout_height="match_parent"
     tools:context=".CreateRoom">
 
+    <include
+        android:id="@+id/createRoomToolbar"
+        layout="@layout/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="22dp"
         android:backgroundTint="#3CB93C"
         android:text="Start"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -22,7 +28,7 @@
         android:id="@+id/cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="22dp"
         android:backgroundTint="#FF5733"
         android:text="Cancel"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -31,18 +37,22 @@
 
     <TextView
         android:id="@+id/id"
-        android:layout_width="67dp"
-        android:layout_height="20dp"
-        android:layout_marginTop="40dp"
+        android:layout_width="58dp"
+        android:layout_height="19dp"
+        android:layout_marginStart="97dp"
+        android:layout_marginTop="109dp"
+        android:layout_marginEnd="256dp"
         android:text="Room id:"
-        app:layout_constraintStart_toStartOf="@+id/idIVQrcode"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/roomidnumber"
         android:layout_width="100dp"
         android:layout_height="42dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginStart="155dp"
+        android:layout_marginEnd="156dp"
         android:clickable="false"
         android:cursorVisible="false"
         android:ems="10"
@@ -51,54 +61,60 @@
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/id" />
 
     <Button
         android:id="@+id/copyBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="285dp"
+        android:layout_marginTop="109dp"
+        android:layout_marginEnd="26dp"
+        android:backgroundTint="@color/mg_rose"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="Copy"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/roomidnumber"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/settings"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="160dp"
+        android:layout_marginEnd="126dp"
         android:text="Settings"
         android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="@+id/idIVQrcode"
-        app:layout_constraintTop_toBottomOf="@+id/id"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.4" />
 
     <TextView
         android:id="@+id/qrtext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="72dp"
         android:text="Scan QR code to join:"
-        app:layout_constraintBottom_toTopOf="@+id/idIVQrcode"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/idIVQrcode"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_centerHorizontal="true"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="212dp"
+        android:layout_marginEnd="55dp"
+        android:layout_marginBottom="147dp"
         android:adjustViewBounds="false"
         android:contentDescription="qrcode"
-        app:layout_constraintBottom_toTopOf="@+id/start"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.73" />
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
