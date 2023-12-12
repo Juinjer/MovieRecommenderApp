@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager
 import com.example.movierecommender.databinding.ActivityCreateRoomBinding
 import androidmads.library.qrgenearator.QRGContents;
 import androidmads.library.qrgenearator.QRGEncoder;
+import androidx.appcompat.widget.Toolbar
 import java.lang.Exception
 import java.lang.Integer.min
 
@@ -31,7 +32,16 @@ class CreateRoom : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityCreateRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val mSocket= SocketHandler.getSocket()!!
+
+        val toolbar: Toolbar = binding.createRoomToolbar.root
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            title = getString(R.string.app_name)
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
+        }
+
+        val mSocket = SocketHandler.getSocket()!!
 
         val b = intent.extras
         Log.d("rid", b.toString())
@@ -51,19 +61,16 @@ class CreateRoom : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         })
-
         binding.start.setOnClickListener(View.OnClickListener {
             val intent = Intent(this, SwipeScreen::class.java)
             intent.putExtra("roomcode", roomId)
             startActivity(intent)
         })
-
         binding.settings.setOnClickListener(View.OnClickListener {
-            val intent = Intent(this,SettingsScreen::class.java)
+            val intent = Intent(this, SettingsScreen::class.java)
             intent.putExtra("roomcode", roomId)
             startActivity(intent)
         })
-
         binding.copyBtn.setOnClickListener(View.OnClickListener {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val id = binding.roomidnumber.text.toString()

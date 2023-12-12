@@ -8,6 +8,14 @@
     android:background="@color/mg_pearl"
     tools:context=".JoinRoom">
 
+    <include
+        android:id="@+id/joinRoomToolbar"
+        layout="@layout/toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/cancel"
         android:layout_width="wrap_content"
@@ -22,11 +30,12 @@
         android:id="@+id/roomidText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="80dp"
         android:ems="10"
         android:hint="Room id"
         android:inputType="number"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,7 +43,7 @@
         android:id="@+id/joinBtn"
         android:layout_width="211dp"
         android:layout_height="42dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
         android:backgroundTint="@color/mg_vandyke"
         android:text="Join"
         app:layout_constraintEnd_toEndOf="parent"
@@ -47,9 +56,10 @@
         android:layout_height="250dp"
         app:layout_constraintBottom_toTopOf="@+id/cancel"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/joinBtn"
-        app:layout_constraintVertical_bias="0.15"
+        app:layout_constraintVertical_bias="0.103"
         app:srcCompat="@android:mipmap/sym_def_app_icon" />
 
     <TextView
