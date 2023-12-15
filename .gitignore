@@ -55,3 +55,4 @@ backend/dist/*
 .env
 venv*/
 __pycache__
+.vs/*
