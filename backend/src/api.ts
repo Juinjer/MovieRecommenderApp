@@ -1,6 +1,6 @@
 import * as request from 'request';
-import { getRandomPositiveRated } from './ratinglogic'
-
+import {Movie} from './interfaces'
+/*
 export async function getRandomMovies(numberOfMovies: number) {
     const response = await fetch(`http://localhost:8000/random/${numberOfMovies}`, {
         method: 'GET',
@@ -29,8 +29,7 @@ export async function getRandomMovies(numberOfMovies: number) {
     return jsonArray;
 }
 
-export async function getSimpleRecommendation(appId: string) {
-    const movieTitle = await getRandomPositiveRated(appId);
+export async function getSimpleRecommendation(movieTitle: string) {
 
     const response = await fetch('http://localhost:8000/simple_recommendation', {
         method: 'POST',
@@ -45,9 +44,7 @@ export async function getSimpleRecommendation(appId: string) {
     return similarMoviesJSON;
 }
 
-export async function getFullRecommendation(appId:string){
-    const movieTitle = await getRandomPositiveRated(appId);
-
+export async function getFullRecommendation(movieTitle:string){
     const response = await fetch('http://localhost:8000/full_recommendation', {
         method: 'POST',
         headers: {
@@ -58,4 +55,73 @@ export async function getFullRecommendation(appId:string){
     const fullRecommendationJSON = await response.json();
     console.log(fullRecommendationJSON)
     return fullRecommendationJSON;
+}
+*/
+
+/**
+ * Retrieves movie suggestions based on the provided movie title.
+ *
+ * @returns A Promise that resolves to an array of Movie objects representing the recommended movies.
+ * @throws If there is an error during the fetch operation or if the response does not match the expected structure.
+ */
+export async function getSuggestions(movieTitle: string): Promise<Movie[]>{
+    try {
+        const response = await fetch('http://localhost:8000/full_recommendation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ "title": movieTitle }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const responseJSON = await response.json();
+        //console.log(fullRecommendationJSON);
+        const suggestions: Movie[] = responseJSON.recommendations.map((movie: any) => {
+            // Map each movie to a Movie object
+            return {
+                index: movie.index,
+                title: movie.title,
+                overview: movie.overview,
+                full_poster_path: movie.full_poster_path,
+                explanation: movie.explanation
+            };
+        });
+
+        return suggestions;
+    } catch (error) {
+        throw new Error(`Error fetching movie suggestions: ${error}`);
+    }
+}
+
+
+/**
+ * Retrieves a number of random movie suggestions.
+ *
+ * @returns A Promise that resolves to an array of length 'numberOfSuggestions' of Movie objects representing the recommended movies.
+ * @throws If there is an error during the fetch operation or if the response does not match the expected structure.
+ */
+export async function getSuggestionsRandom(numberOfSuggestions: number): Promise<Movie[]> {
+    try{
+        const response = await fetch(`http://localhost:8000/random/${numberOfSuggestions}`, {
+            method: 'GET',
+        });
+        const responseJSON = await response.json();
+        const suggestions: Movie[] = responseJSON.movies.map((movie: any) => {
+            // Map each movie to a Movie object
+            return {
+                index: movie.index,
+                title: movie.title,
+                overview: movie.overview,
+                full_poster_path: movie.full_poster_path,
+            };
+        });
+
+        return suggestions;
+    } catch (error) {
+        throw new Error(`Error fetching movie suggestions: ${error}`);
+    }
 }
