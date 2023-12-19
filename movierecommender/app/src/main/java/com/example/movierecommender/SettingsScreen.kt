@@ -24,8 +24,15 @@ class SettingsScreen : AppCompatActivity() {
         binding = SettingsScreenBinding.inflate(layoutInflater)
         mSocket = SocketHandler.getSocket()!!
         setContentView(binding.root)
+
+
         val toolbar: Toolbar = binding.settingsToolbar.root
         setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            title = getString(R.string.app_name)
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
+        }
 
         val b = intent.extras
         roomId = "404"

@@ -2,7 +2,7 @@ package com.example.movierecommender
 
 import android.app.Application
 
-class UniqueID:Application() {
+class UniqueID : Application() {
     var uniqueId: String = ""
         private set
     var initialized: Boolean = false

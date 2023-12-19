@@ -23,7 +23,8 @@
             android:theme="@style/Theme.MovieRecommender" />
         <activity
             android:name=".SettingsScreen"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".CreateRoom" />
         <activity
             android:name=".SwipeScreen"
             android:exported="false" />
@@ -41,7 +42,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="MovieGrabber">
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
