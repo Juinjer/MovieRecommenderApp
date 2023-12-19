@@ -29,7 +29,7 @@ class WaitingRoom : AppCompatActivity() {
             val editable: Editable = Editable.Factory.getInstance().newEditable(s)
             binding.roomId.text = editable
         }
-        mSocket?.on("hostStart") {_->
+        mSocket?.on("hostStart") { _ ->
             val b = Bundle()
             b.putString("roomcode", binding.roomId.text.toString())
             val intent = Intent(this, SwipeScreen::class.java)
@@ -37,7 +37,7 @@ class WaitingRoom : AppCompatActivity() {
             startActivity(intent)
         }
         binding.cancel.setOnClickListener(View.OnClickListener() {
-            val id= (application as UniqueID).uniqueId
+            val id = (application as UniqueID).uniqueId
             val roomID = binding.roomId.text.toString()
             val data = listOf(roomID, id)
             mSocket?.emit("leaveRoom", data.joinToString(","))
@@ -52,11 +52,10 @@ class WaitingRoom : AppCompatActivity() {
         if (b != null) {
             val s = b.getString("members")!!
             val splitted = s.split(",")
-            for(st in splitted) {
-                nameList.add(Name(R.drawable.camera_logo_foreground,st))
+            for (st in splitted) {
+                nameList.add(Name(R.drawable.camera_logo_foreground, st))
             }
         }
-
         nameAdapter = NameAdapter(nameList)
         recyclerView.adapter = nameAdapter
     }
