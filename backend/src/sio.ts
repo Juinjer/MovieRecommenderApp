@@ -1,23 +1,35 @@
 import * as http from 'http';
-import { handleMovieRating } from './ratinglogic'
-import { RateFilmData } from './interfaces';
+import { Movie, MovieRating } from './interfaces';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import { Room } from './roomlogic';
-import { getRandomMovies, getSimpleRecommendation, getFullRecommendation} from './api';
 
 const server = http.createServer();
 const io = new SocketIOServer(server);
 
-const roomlist: Room[] = [];
+const roomList: Room[] = [];
 const connections = new Map<string, Socket>();
 
 function findRoom(roomId:number): Room|null{
-    for(const r of roomlist){
-        if(r.getRoomId() == roomId){
-            return r;
+    for(const room of roomList){
+        if(room.getRoomId() == roomId){
+            return room;
         }
     }
     return null;
+}
+
+export function notifyProcessingDone(roomMembers: string[], suggestions:Movie[]) {
+    if (roomMembers != null) {
+        const suggestionsJSON = JSON.stringify(suggestions);
+        // Iterate through the members of the room and retrieve their sockets from the connections map
+        for (const member of roomMembers) {
+            const socket = connections.get(member)!!;
+            console.log(suggestionsJSON);
+            socket.emit('processingDone', suggestionsJSON);
+        }
+    } else {
+        throw new Error(`error in emitting to room members`);
+    }
 }
 
 io.on('connection', (socket: Socket) => {
@@ -28,16 +40,16 @@ io.on('connection', (socket: Socket) => {
 		console.log(`Received: ${message}`);
 
 		find: {
-			for (const r of roomlist) {
-				if (message === r.getHost()) {
-					socket.emit("crId", `${r.getRoomId()}`);
+			for (const room of roomList) {
+				if (message === room.getHost()) {
+					socket.emit("crId", `${room.getRoomId()}`);
 					break find;
 				}
 			}
 
-			const r = new Room(message);
-			roomlist.push(r);
-			socket.emit("crId", `${r.getRoomId()}`);
+			const room = new Room(message);
+			roomList.push(room);
+			socket.emit("crId", `${room.getRoomId()}`);
 		}
 	});
 
@@ -45,34 +57,34 @@ io.on('connection', (socket: Socket) => {
 		const args = message.split(",");
 		connections.set(args[1], socket);
 
-        const r:Room|null = findRoom(parseInt(args[0]));
-        if(r == null){
+        const room:Room|null = findRoom(parseInt(args[0]));
+        if(room == null){
             socket.emit("jrRes", "404", "404");
         } else{
-            for (const member of r.getMembers()) {
+            for (const member of room.getMembers()) {
                 const soc = connections.get(member);
-                soc?.emit("joinNotif", r.getNames().get(args[1]));
+                soc?.emit("joinNotif", room.getNames().get(args[1]));
             }
 
-            r.addMember(args[1]);
-            console.log("members " + r.getMembers().toString() + " names " + Array.from(r.getNames()).toString());
-            socket.emit("jrRes", Array.from(r.getNames().values()).toString(), `${r.getRoomId()}`);
+            room.addMember(args[1]);
+            console.log("members " + room.getMembers().toString() + " names " + Array.from(room.getNames()).toString());
+            socket.emit("jrRes", Array.from(room.getNames().values()).toString(), `${room.getRoomId()}`);
         }
     });
 
 	socket.on('leaveRoom', (message: string) => {
 		const args = message.split(",");
 
-		const r:Room|null = findRoom(parseInt(args[0]));
-        if(r == null){
+		const room:Room|null = findRoom(parseInt(args[0]));
+        if(room == null){
             socket.emit("jrRes", "404", "404");
         } else{
-            for (const member of r.getMembers()) {
+            for (const member of room.getMembers()) {
                 const soc = connections.get(member);
-                soc?.emit("leaveNotif", r.getNames().get(args[1]));
+                soc?.emit("leaveNotif", room.getNames().get(args[1]));
             }
 
-            r.removeMember(args[1]);
+            room.removeMember(args[1]);
             socket.disconnect();
         }
 	});
@@ -80,12 +92,12 @@ io.on('connection', (socket: Socket) => {
 	socket.on('startLobby', (message: string) => {
 		console.log("started lobby", message);
 		const args = message.split(",");
-		const r:Room|null = findRoom(parseInt(args[0]));
-        if(r == null){
+		const room:Room|null = findRoom(parseInt(args[0]));
+        if(room == null){
             socket.emit("jrRes", "404", "404");
         } else{
-			if (r.getHost() === args[1]) {
-				for (const mem of r.getMembers()) {
+			if (room.getHost() === args[1]) {
+				for (const mem of room.getMembers()) {
 					let sock = connections.get(mem);
 					sock?.emit("hostStart");
 				}
@@ -97,12 +109,12 @@ io.on('connection', (socket: Socket) => {
 		console.log("get settings", message)
 		const roomId: number = parseInt(message);
 
-		const r:Room|null = findRoom(roomId);
-        if(r == null){
+		const room:Room|null = findRoom(roomId);
+        if(room == null){
             socket.emit("jrRes", "404", "404");
         } else{
-            console.log("getSettingsResp", r.getNSwipes().toString());
-            socket.emit("getSettingsResp", r.getNSwipes().toString());
+            console.log("getSettingsResp", room.getNSwipes().toString());
+            socket.emit("getSettingsResp", room.getNSwipes().toString());
         }
 	});
 
@@ -112,49 +124,78 @@ io.on('connection', (socket: Socket) => {
 		const roomId: number = parseInt(args[0]);
 		const swipes: number = parseInt(args[1]);
 
-        const r:Room|null = findRoom(roomId);
-        if(r == null){
+        const room:Room|null = findRoom(roomId);
+        if(room == null){
             socket.emit("jrRes", "404", "404");
         } else{
             console.log(swipes);
-            r.setNSwipes(swipes);
+            room.setNSwipes(swipes);
         }
 	});
 
+    /*
     socket.on('getMovies', async (numberOfMovies: number) => {
-        let movieDetails = await getRandomMovies(numberOfMovies);
+        let movieDetails = await getSuggestionsRandom(numberOfMovies);
         socket.emit('getMoviesResp', movieDetails);
-        //const r:Room = findRoom( parseInt(message));        
-        // socket.emit('getMoviesResp', await r.getNextMovies());
+        //const room:Room = findRoom( parseInt(message));        
+        // socket.emit('getMoviesResp', await room.getNextMovies());
+    });
+    */
+
+    socket.on('rateFilm', async (data: string) => {
+        try {
+            const args = data.split(";;;");
+            const roomId: number = parseInt(args[0]);
+            const appId: string = args[1];
+            const movieJsonString: string = args[2];
+            const rating: number = parseInt(args[3]);
+
+            const movie: Movie = JSON.parse(movieJsonString);
+
+            const movieRating: MovieRating = {
+                appId,
+                rating,
+            };
+
+            const room:Room|null = findRoom(roomId);
+            if ( room == null) {
+                socket.emit("jrRes", "404", "404");
+            } else {
+                room.addMovieRating(movie, movieRating);
+                console.log("Rating added", `{${movie.title}}`, movieRating);
+            }
+        } catch (error) {
+            console.error('Error processing rateFilm event:', error);
+        }
     });
 
-    socket.on('rateFilm', async (data:string) =>{
-        const args = data.split(",");
-        const roomId: string = args[0];
-        const appId: string = args[1];
-        const movieTitle: string = args[2];
-        const rating: number = parseInt(args[3]);
-
-        const rateFilmData: RateFilmData = {
-			roomId,
-			appId,
-            movieTitle,
-            rating,
-		};
-
-        console.log("App id ", appId);
-        handleMovieRating(rateFilmData);
+    //TODO room api for the processing?
+    socket.on('getSuggestions', async(roomId: number) => {
+        console.log("Suggestions requested", roomId);
+        const room:Room|null = findRoom(roomId);
+        if(room == null){
+            socket.emit("jrRes", "404", "404");
+        } else{
+            let suggestions = await room.getSuggestions();
+            socket.emit('getSuggestionsResp', JSON.stringify(suggestions));
+        }
     });
 
-    socket.on('getSimilar', async(appId:string) => {
-        let movies = await getSimpleRecommendation(appId);
+/*
+    socket.on('getSimilar', async(movieTitle:string) => {
+        let movies = await getFullRecommendation(movieTitle);
         console.log("Similar movies", movies);
         socket.emit('getSimilarResp', movies);
     });
-
+*/
 	socket.on('disconnect', () => {
         console.log('Client disconnected');
     });
+
+    async function sendRecommendations(recommendations: Movie[]) {
+            socket.emit('recommendations', recommendations);
+    }
+
 });
 
 server.listen(8080, () => {

@@ -2,14 +2,11 @@ package com.example.movierecommender
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.movierecommender.databinding.SwipeScreenBinding
 import com.squareup.picasso.Picasso
@@ -30,34 +27,24 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
     private val flingThreshold = 30
     private val flingVelocityThreshold = 50
 
-    private var swipesThreshold = 0;
-    //private var numberOfSwipesDone = 0;
-
     // Buffer information for movies
     private val movieBuffer = mutableListOf<Movie>()
     private var currentMovieIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //TODO: buffer more movies to avoid loading
         super.onCreate(savedInstanceState)
         binding = SwipeScreenBinding.inflate(layoutInflater)
         gestureDetector = GestureDetector(this, this);
         setContentView(binding.root)
         mSocket = SocketHandler.getSocket()!!
+
         val b = intent.extras
         roomId = "404"
         if (b != null) {
             roomId = b.getString("roomcode")!!
         }
 
-        // Receive the swipeThreshold from the backend
-        mSocket.emit("getSettings", roomId)
-        mSocket.on("getSettingsResp"){ args ->
-            // Receive the number of swipes threshold for the room
-            this.swipesThreshold = Integer.parseInt(args[0].toString());
-            // Fetch an initial batch of movies
-            fetchMovies(swipesThreshold);
-        }
+        fetchMovies();
 
         id = (application as UniqueID).uniqueId
 
@@ -70,74 +57,95 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         })
     }
 
-    private fun fetchMovies(amountMovies: Int){
-        mSocket.emit("getMovies", amountMovies)
-        mSocket.on("getMoviesResp") { args ->
+    private fun fetchMovies(){
+        mSocket.emit("getSuggestions", roomId)
+        mSocket.on("getSuggestionsResp") { args ->
             val jsonArray = JSONArray(args[0].toString())
+            Log.d("Room suggestions", jsonArray.toString());
+
             for (i in 0 until jsonArray.length()) {
                 val jsonObject = JSONObject(jsonArray.getString(i))
-                Log.d("movieResp args", jsonObject.toString())
-                val img = jsonObject.getString("img")
+                val index = jsonObject.getString("index").toInt()
+                val fullPosterPath = jsonObject.getString("full_poster_path")
                 val title = jsonObject.getString("title")
-                val desc = jsonObject.getString("desc")
-                movieBuffer.add(Movie(img, title, desc))
+                val overview = jsonObject.getString("overview")
+                movieBuffer.add( Movie(index,title, overview, fullPosterPath))
             }
             displayNextMovie()
         }
     }
 
     private fun displayNextMovie() {
-        Log.d("DisplayNextMovie", "$currentMovieIndex,${movieBuffer.size},$swipesThreshold")
+        Log.d("DisplayNextMovie", "$currentMovieIndex,${movieBuffer.size}")
         if (currentMovieIndex < movieBuffer.size) {
             runOnUiThread {
                 val movie = movieBuffer[currentMovieIndex++]
-                val img = movie.img
+                val fullPosterPath = movie.fullPosterPath
                 val title = movie.title
-                val desc = movie.desc
-                Log.d("img", img)
+                val overview = movie.overview
+                /*
+                Log.d("index", movie.index)
+                Log.d("fullPosterPath", posterPath)
                 Log.d("title", title)
-                Log.d("desc", desc)
-                Picasso.get().load(img).into(binding.imageView2)
+                Log.d("overview", overview)
+                */
+
+                Picasso.get().load(fullPosterPath).into(binding.imageView2)
                 var editable: Editable = Editable.Factory.getInstance().newEditable(title)
                 binding.titelText.text = editable
-                editable = Editable.Factory.getInstance().newEditable(desc)
+                editable = Editable.Factory.getInstance().newEditable(overview)
                 binding.filmDescription.text = editable
             }
         } else {
-            if (currentMovieIndex == swipesThreshold) {
                 showExplanationScreen()
-            }
         }
     }
 
     private fun handleLike(){
-        //TODO: pass some filmid
-        val data = "$roomId,$id,${movieBuffer[currentMovieIndex-1].title},${1}"
+        val likedMovie = movieBuffer[currentMovieIndex - 1]
+        val jsonString = convertMovieToJsonString(likedMovie)
+
+        val data = "$roomId;;;$id;;;$jsonString;;;${1}"
         mSocket.emit("rateFilm", data)
+
         Log.d("Rating performed", "liked")
-        //numberOfSwipesDone++;
         displayNextMovie()
     }
 
+    // FUTURE: Implement a skip on swiping upward
     private fun handleSkip(){
     }
 
     private fun handleDislike(){
-        //TODO: pass some filmid
-        val data = "$roomId,$id,${movieBuffer[currentMovieIndex-1].title},${-1}"
+        val dislikedMovie = movieBuffer[currentMovieIndex - 1]
+        val jsonString = convertMovieToJsonString(dislikedMovie)
+
+        val data = "$roomId;;;$id;;;$jsonString;;;${-1}"
         mSocket.emit("rateFilm", data)
+
         Log.d("Rating performed", "disliked")
-        //numberOfSwipesDone++;
         displayNextMovie()
     }
 
 
     private fun showExplanationScreen(){
-        //if (numberOfSwipesDone == swipesThreshold) {
         val intent = Intent(this, ExplanationWaitingRoom::class.java)
         startActivity(intent)
-        //}
     }
+
+    // Function to convert Movie object to JSON string
+    private fun convertMovieToJsonString(movie: Movie): String {
+        val json = JSONObject().apply {
+            put("index", movie.index)
+            put("title", movie.title)
+            put("overview", movie.overview)
+            put("full_poster_path", movie.fullPosterPath)
+        }
+
+        return json.toString()
+    }
+
+
 
     // Override this method to recognize touch event
     override fun onTouchEvent(event: MotionEvent): Boolean {

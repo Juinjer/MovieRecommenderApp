@@ -1,4 +1,9 @@
 package com.example.movierecommender
 
-// Movie data class
-data class Movie(val img: String, val title: String, val desc: String);
+data class Movie(
+    val index: Int,
+    val title: String,
+    val overview: String,
+    val fullPosterPath: String,
+    val explanation: String? = null
+)
