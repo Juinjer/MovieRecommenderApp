@@ -106,7 +106,7 @@ export async function getSuggestions(movieTitle: string): Promise<Movie[]>{
  */
 export async function getSuggestionsRandom(numberOfSuggestions: number): Promise<Movie[]> {
     try{
-        const response = await fetch(`http://localhost:8000/random/${numberOfSuggestions}`, {
+        const response = await fetch(`http://127.0.0.1:8000/random/${numberOfSuggestions}`, {
             method: 'GET',
         });
         const responseJSON = await response.json();

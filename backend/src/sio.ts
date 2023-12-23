@@ -197,8 +197,8 @@ io.on('connection', (socket: Socket) => {
     }
 
 });
-
-server.listen(8080, () => {
-	console.log('Server listening on port 8080');
+let port = 9999;
+server.listen(port, () => {
+	console.log('Server listening on port 9999');
 });
 
