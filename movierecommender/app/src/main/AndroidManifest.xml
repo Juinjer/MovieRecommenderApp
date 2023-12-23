@@ -18,31 +18,45 @@
         tools:targetApi="31">
         <activity
             android:name=".ExplanationWaitingRoom"
+            android:configChanges="orientation"
             android:exported="false"
             android:label="@string/title_activity_explation_waiting_room"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.MovieRecommender" />
         <activity
             android:name=".SettingsScreen"
+            android:configChanges="orientation"
             android:exported="false"
-            android:parentActivityName=".CreateRoom" />
+            android:parentActivityName=".CreateRoom"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SwipeScreen"
-            android:exported="false" />
+            android:configChanges="orientation"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".WaitingRoom"
-            android:exported="false" />
+            android:configChanges="orientation"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".JoinRoom"
+            android:configChanges="orientation"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".CreateRoom"
+            android:configChanges="orientation"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation"
             android:exported="true"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
