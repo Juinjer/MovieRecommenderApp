@@ -16,6 +16,7 @@ import io.socket.client.Socket
 import org.json.JSONObject
 import android.widget.Toast
 import org.json.JSONArray
+import org.json.JSONException
 import kotlin.math.abs
 
 
@@ -81,7 +82,20 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 var editable: Editable = Editable.Factory.getInstance().newEditable(title)
                 binding.tvRecommendationFactors.text = editable
                 editable = Editable.Factory.getInstance().newEditable(recommendationFactors)
-                binding.tvRecommendationExplained.text = editable
+                println(editable.toString())
+                if (editable.startsWith("{")) {
+                    try {
+                        val jsonObject = JSONObject(editable.toString())
+                        val keysList = jsonObject.keys().asSequence().toList()
+                        val keysString = keysList.joinToString(", ")
+                        binding.tvRecommendationExplained.text = keysString
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                        "Tried to parse a JSON string, but it didn't work."
+                    }
+                } else {
+                    binding.tvRecommendationExplained.text = editable
+                }
                 var recommendationTitle = "Recommendation #" + (currentRecommendationIndex + 1)
                 binding.tvRecommendedMovie.text = recommendationTitle
             }
