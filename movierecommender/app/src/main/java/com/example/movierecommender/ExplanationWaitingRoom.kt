@@ -91,6 +91,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
             if (loadingRecommendations) {
                 // Show loading state
                 binding.tvLoadingRecommendations.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.VISIBLE
                 // Hide other UI elements
                 binding.ivRecommendedMovie.visibility = View.GONE
                 binding.tvRecommendedMovie.visibility = View.GONE
@@ -99,6 +100,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
             } else {
                 // Hide loading state
                 binding.tvLoadingRecommendations.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
                 // Show other UI elements
                 binding.ivRecommendedMovie.visibility = View.VISIBLE
                 binding.tvRecommendedMovie.visibility = View.VISIBLE
