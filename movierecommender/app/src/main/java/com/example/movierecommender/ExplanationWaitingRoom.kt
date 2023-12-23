@@ -9,19 +9,21 @@ import android.widget.TextView
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Button
 import com.example.movierecommender.databinding.SwipeScreenBinding
 import com.squareup.picasso.Picasso
 import io.socket.client.Socket
 import org.json.JSONObject
 import android.widget.Toast
 import org.json.JSONArray
+import org.json.JSONException
 import kotlin.math.abs
 
 
 class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureListener {
     private lateinit var binding: ExplanationWaitingRoomBinding
-    private lateinit var roomId:String
-    private lateinit var id:String
+    private lateinit var roomId: String
+    private lateinit var id: String
     private lateinit var mSocket: Socket
 
     private lateinit var gestureDetector: GestureDetector
@@ -37,7 +39,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
         binding = ExplanationWaitingRoomBinding.inflate(layoutInflater)
         gestureDetector = GestureDetector(this, this);
         setContentView(binding.root)
-        mSocket= SocketHandler.getSocket()!!
+        mSocket = SocketHandler.getSocket()!!
         updateLoadingState(true);
 
         val b = intent.extras
@@ -60,12 +62,11 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 val overview = jsonObject.getString("overview")
                 val fullPosterPath = jsonObject.getString("full_poster_path")
                 val explanation = jsonObject.getString("explanation")
-                recommendationBuffer.add( Movie(index,title, overview, fullPosterPath, explanation))
+                recommendationBuffer.add(Movie(index, title, overview, fullPosterPath, explanation))
             }
             updateLoadingState(false)
             displayRecommendation(recommendationBuffer[0]);
         }
-
     }
 
     private fun displayRecommendation(recommendation: Movie) {
@@ -81,7 +82,22 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 var editable: Editable = Editable.Factory.getInstance().newEditable(title)
                 binding.tvRecommendationFactors.text = editable
                 editable = Editable.Factory.getInstance().newEditable(recommendationFactors)
-                binding.tvRecommendationExplained.text = editable
+                println(editable.toString())
+                if (editable.startsWith("{")) {
+                    try {
+                        val jsonObject = JSONObject(editable.toString())
+                        val keysList = jsonObject.keys().asSequence().toList()
+                        val keysString = keysList.joinToString(", ")
+                        binding.tvRecommendationExplained.text = keysString
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                        "Tried to parse a JSON string, but it didn't work."
+                    }
+                } else {
+                    binding.tvRecommendationExplained.text = editable
+                }
+                var recommendationTitle = "Recommendation #" + (currentRecommendationIndex + 1)
+                binding.tvRecommendedMovie.text = recommendationTitle
             }
         }
     }
@@ -91,25 +107,39 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
             if (loadingRecommendations) {
                 // Show loading state
                 binding.tvLoadingRecommendations.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.VISIBLE
                 // Hide other UI elements
                 binding.ivRecommendedMovie.visibility = View.GONE
                 binding.tvRecommendedMovie.visibility = View.GONE
                 binding.tvRecommendationFactors.visibility = View.GONE
                 binding.tvRecommendationExplained.visibility = View.GONE
+                binding.swLeftBtn.visibility = View.GONE
+                binding.swRightBtn.visibility = View.GONE
             } else {
                 // Hide loading state
                 binding.tvLoadingRecommendations.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
                 // Show other UI elements
                 binding.ivRecommendedMovie.visibility = View.VISIBLE
                 binding.tvRecommendedMovie.visibility = View.VISIBLE
                 binding.tvRecommendationFactors.visibility = View.VISIBLE
                 binding.tvRecommendationExplained.visibility = View.VISIBLE
+                // Update swipe button visibility
+                binding.swLeftBtn.visibility = View.GONE
+                binding.swRightBtn.visibility = View.VISIBLE
             }
         }
     }
 
-    private fun handleNext(){
-        if( currentRecommendationIndex<recommendationBuffer.size-1) {
+    private fun updateSwipeButtonVisibility() {
+        binding.swLeftBtn.visibility =
+            if (currentRecommendationIndex > 0) View.VISIBLE else View.INVISIBLE
+        binding.swRightBtn.visibility =
+            if (currentRecommendationIndex < recommendationBuffer.size - 1) View.VISIBLE else View.INVISIBLE
+    }
+
+    private fun handleNext() {
+        if (currentRecommendationIndex < recommendationBuffer.size - 1) {
             // Display the next recommendation
             val nextRecommendation = recommendationBuffer[++currentRecommendationIndex]
             displayRecommendation(nextRecommendation)
@@ -117,10 +147,11 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
             // No more recommendations, show a toast
             Toast.makeText(this, "Last recommendation reached", Toast.LENGTH_SHORT).show()
         }
+        updateSwipeButtonVisibility()
     }
 
-    private fun handlePrevious(){
-        if( currentRecommendationIndex>0) {
+    private fun handlePrevious() {
+        if (currentRecommendationIndex > 0) {
             // Display the next recommendation
             val nextRecommendation = recommendationBuffer[--currentRecommendationIndex]
             displayRecommendation(nextRecommendation)
@@ -128,14 +159,14 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
             // No more recommendations, show a toast
             Toast.makeText(this, "First recommendation reached", Toast.LENGTH_SHORT).show()
         }
+        updateSwipeButtonVisibility()
     }
 
     // Override this method to recognize touch event
     override fun onTouchEvent(event: MotionEvent): Boolean {
         return if (gestureDetector.onTouchEvent(event)) {
             true
-        }
-        else {
+        } else {
             super.onTouchEvent(event)
         }
     }
@@ -145,7 +176,12 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
      * It uses the flingThresholds to see whether it was a valid movement.
      * It uses begin and end position to differentiate directions
      */
-    override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+    override fun onFling(
+        e1: MotionEvent?,
+        e2: MotionEvent,
+        velocityX: Float,
+        velocityY: Float
+    ): Boolean {
         try {
             val diffY = e2.y - e1!!.y
             val diffX = e2.x - e1.x
@@ -154,25 +190,22 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 if (abs(diffX) > flingThreshold && abs(velocityX) > flingVelocityThreshold) {
                     if (diffX > 0) {
                         // Toast.makeText(applicationContext, "Left to Right swipe gesture", Toast.LENGTH_SHORT).show()
+                        handlePrevious()
+                    } else {
+                        // Toast.makeText(applicationContext, "Right to Left swipe gesture", Toast.LENGTH_SHORT).show()
                         handleNext()
                     }
-                    else {
-                        // Toast.makeText(applicationContext, "Right to Left swipe gesture", Toast.LENGTH_SHORT).show()
-                        handlePrevious()
-                    }
                 }
-            }else{
+            } else {
                 if (abs(diffY) > flingThreshold && abs(velocityY) > flingVelocityThreshold) {
                     if (diffY > 0) {
                         // Toast.makeText(applicationContext, "Up to Down gesture", Toast.LENGTH_SHORT).show()
-                    }
-                    else {
+                    } else {
                         // Toast.makeText(applicationContext, "Down to Up swipe gesture", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
-        }
-        catch (exception: Exception) {
+        } catch (exception: Exception) {
             exception.printStackTrace()
         }
         return true
@@ -191,13 +224,16 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
         return false
     }
 
-    override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+    override fun onScroll(
+        e1: MotionEvent?,
+        e2: MotionEvent,
+        distanceX: Float,
+        distanceY: Float
+    ): Boolean {
         return false
     }
 
     override fun onLongPress(e: MotionEvent) {
         return
     }
-
-
 }

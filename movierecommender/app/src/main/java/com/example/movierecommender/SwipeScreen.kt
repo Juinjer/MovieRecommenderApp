@@ -92,7 +92,7 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
 
                 Picasso.get().load(fullPosterPath).into(binding.imageView2)
                 var editable: Editable = Editable.Factory.getInstance().newEditable(title)
-                binding.titelText.text = editable
+                binding.titleText.text = editable
                 editable = Editable.Factory.getInstance().newEditable(overview)
                 binding.filmDescription.text = editable
             }
