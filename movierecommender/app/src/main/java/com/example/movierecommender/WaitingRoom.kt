@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movierecommender.databinding.WaitingRoomBinding
@@ -41,6 +42,7 @@ class WaitingRoom : AppCompatActivity() {
             val roomID = binding.roomId.text.toString()
             val data = listOf(roomID, id)
             mSocket?.emit("leaveRoom", data.joinToString(","))
+            //TODO after joining false room, no way back to homescreen...
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         })
@@ -52,8 +54,22 @@ class WaitingRoom : AppCompatActivity() {
         if (b != null) {
             val s = b.getString("members")!!
             val splitted = s.split(",")
-            for (st in splitted) {
-                nameList.add(Name(R.drawable.camera_logo_foreground, st))
+            val imageResources = arrayOf(
+                R.drawable.alligator,
+                R.drawable.bat,
+                R.drawable.cormorant,
+                R.drawable.coyote,
+                R.drawable.dinosaur,
+                R.drawable.elephant,
+                R.drawable.giraffe,
+                R.drawable.kangaroo,
+                R.drawable.llama,
+                R.drawable.penguin,
+                R.drawable.raccoon
+            )
+            imageResources.shuffle()
+            for ((index, st) in splitted.withIndex()) {
+                nameList.add(Name(imageResources[index], st))
             }
         }
         nameAdapter = NameAdapter(nameList)

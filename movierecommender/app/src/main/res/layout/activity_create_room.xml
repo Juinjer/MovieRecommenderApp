@@ -5,6 +5,7 @@
     android:id="@+id/mainid"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/mg_pearl"
     tools:context=".CreateRoom">
 
     <include

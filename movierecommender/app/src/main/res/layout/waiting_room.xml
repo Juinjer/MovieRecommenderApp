@@ -2,9 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainid"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/mainid"
+    android:background="@color/mg_pearl"
     tools:context=".WaitingRoom">
 
     <EditText
@@ -28,7 +29,7 @@
         android:id="@+id/textView2"
         android:layout_width="271dp"
         android:layout_height="70dp"
-        android:text="Waiting for the host to start the lobby ..."
+        android:text="Waiting for the host..."
         android:textAlignment="center"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/cancel"
@@ -36,6 +37,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/roomId"
         app:layout_constraintVertical_bias="0.9" />
+
     <Button
         android:id="@+id/cancel"
         android:layout_width="wrap_content"
@@ -46,6 +48,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+<!--    TODO background color vandyke, text color white...-->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="300dp"
@@ -54,4 +57,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/roomId" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
