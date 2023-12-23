@@ -78,5 +78,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageButton
+        android:id="@+id/swRightBtn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:background="@null"
+        android:scaleType="fitXY"
+        android:src="@drawable/arrow_right_47"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ivRecommendedMovie"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/mg_vandyke" />
+
+    <ImageButton
+        android:id="@+id/swLeftBtn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="7dp"
+        android:background="@null"
+        android:scaleType="fitXY"
+        android:src="@drawable/arrow_left_44"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/ivRecommendedMovie"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/mg_vandyke" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Button
 import com.example.movierecommender.databinding.SwipeScreenBinding
 import com.squareup.picasso.Picasso
 import io.socket.client.Socket
@@ -65,7 +66,6 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
             updateLoadingState(false)
             displayRecommendation(recommendationBuffer[0]);
         }
-
     }
 
     private fun displayRecommendation(recommendation: Movie) {
@@ -99,6 +99,8 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 binding.tvRecommendedMovie.visibility = View.GONE
                 binding.tvRecommendationFactors.visibility = View.GONE
                 binding.tvRecommendationExplained.visibility = View.GONE
+                binding.swLeftBtn.visibility = View.GONE
+                binding.swRightBtn.visibility = View.GONE
             } else {
                 // Hide loading state
                 binding.tvLoadingRecommendations.visibility = View.GONE
@@ -108,8 +110,18 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 binding.tvRecommendedMovie.visibility = View.VISIBLE
                 binding.tvRecommendationFactors.visibility = View.VISIBLE
                 binding.tvRecommendationExplained.visibility = View.VISIBLE
+                // Update swipe button visibility
+                binding.swLeftBtn.visibility = View.GONE
+                binding.swRightBtn.visibility = View.VISIBLE
             }
         }
+    }
+
+    private fun updateSwipeButtonVisibility() {
+        binding.swLeftBtn.visibility =
+            if (currentRecommendationIndex > 0) View.VISIBLE else View.INVISIBLE
+        binding.swRightBtn.visibility =
+            if (currentRecommendationIndex < recommendationBuffer.size - 1) View.VISIBLE else View.INVISIBLE
     }
 
     private fun handleNext() {
@@ -121,6 +133,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
             // No more recommendations, show a toast
             Toast.makeText(this, "Last recommendation reached", Toast.LENGTH_SHORT).show()
         }
+        updateSwipeButtonVisibility()
     }
 
     private fun handlePrevious() {
@@ -132,6 +145,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
             // No more recommendations, show a toast
             Toast.makeText(this, "First recommendation reached", Toast.LENGTH_SHORT).show()
         }
+        updateSwipeButtonVisibility()
     }
 
     // Override this method to recognize touch event
@@ -162,10 +176,10 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 if (abs(diffX) > flingThreshold && abs(velocityX) > flingVelocityThreshold) {
                     if (diffX > 0) {
                         // Toast.makeText(applicationContext, "Left to Right swipe gesture", Toast.LENGTH_SHORT).show()
-                        handleNext()
+                        handlePrevious()
                     } else {
                         // Toast.makeText(applicationContext, "Right to Left swipe gesture", Toast.LENGTH_SHORT).show()
-                        handlePrevious()
+                        handleNext()
                     }
                 }
             } else {
@@ -208,6 +222,4 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
     override fun onLongPress(e: MotionEvent) {
         return
     }
-
-
 }
