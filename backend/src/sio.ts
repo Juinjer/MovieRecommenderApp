@@ -24,7 +24,7 @@ export function notifyProcessingDone(roomMembers: string[], suggestions:Movie[])
         // Iterate through the members of the room and retrieve their sockets from the connections map
         for (const member of roomMembers) {
             const socket = connections.get(member)!!;
-            console.log(suggestionsJSON);
+            //console.log(suggestionsJSON);
             socket.emit('processingDone', suggestionsJSON);
         }
     } else {
@@ -67,7 +67,7 @@ io.on('connection', (socket: Socket) => {
             }
 
             room.addMember(args[1]);
-            console.log("members " + room.getMembers().toString() + " names " + Array.from(room.getNames()).toString());
+            //console.log("members " + room.getMembers().toString() + " names " + Array.from(room.getNames()).toString());
             socket.emit("jrRes", Array.from(room.getNames().values()).toString(), `${room.getRoomId()}`);
         }
     });
@@ -113,7 +113,7 @@ io.on('connection', (socket: Socket) => {
         if(room == null){
             socket.emit("jrRes", "404", "404");
         } else{
-            console.log("getSettingsResp", room.getNSwipes().toString());
+            //console.log("getSettingsResp", room.getNSwipes().toString());
             socket.emit("getSettingsResp", room.getNSwipes().toString());
         }
 	});
@@ -128,7 +128,7 @@ io.on('connection', (socket: Socket) => {
         if(room == null){
             socket.emit("jrRes", "404", "404");
         } else{
-            console.log(swipes);
+            //console.log(swipes);
             room.setNSwipes(swipes);
         }
 	});

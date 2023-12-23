@@ -66,7 +66,7 @@ export async function getFullRecommendation(movieTitle:string){
  */
 export async function getSuggestions(movieTitle: string): Promise<Movie[]>{
     try {
-        const response = await fetch('http://localhost:8000/full_recommendation', {
+        const response = await fetch('http://127.0.0.1:8000/full_recommendation', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -75,11 +75,11 @@ export async function getSuggestions(movieTitle: string): Promise<Movie[]>{
         });
 
         if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
+          console.error(`Request failed with status ${response.status}`);
+            //throw new Error(`Request failed with status ${response.status}`);
         }
 
         const responseJSON = await response.json();
-        //console.log(fullRecommendationJSON);
         const suggestions: Movie[] = responseJSON.recommendations.map((movie: any) => {
             // Map each movie to a Movie object
             return {
@@ -93,7 +93,9 @@ export async function getSuggestions(movieTitle: string): Promise<Movie[]>{
 
         return suggestions;
     } catch (error) {
-        throw new Error(`Error fetching movie suggestions: ${error}`);
+        console.log("test");
+        console.error(error);
+        return [];
     }
 }
 
@@ -122,6 +124,8 @@ export async function getSuggestionsRandom(numberOfSuggestions: number): Promise
 
         return suggestions;
     } catch (error) {
-        throw new Error(`Error fetching movie suggestions: ${error}`);
+        console.log("test");
+        console.error(error);
+        return [];
     }
 }

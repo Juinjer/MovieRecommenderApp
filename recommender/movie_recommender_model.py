@@ -25,6 +25,7 @@ def get_random_movies(number_of_movies, top=100):
 
 
 def get_similar_movies(movie_title, k=5):
+    print("similar movies")
     movie_index = df[df['title'] == movie_title].index[0]
     distances, indices = model.kneighbors(tfidf_matrix[movie_index],
                                           n_neighbors=k + 1)
@@ -34,6 +35,7 @@ def get_similar_movies(movie_title, k=5):
 
 
 def get_explanation(similar_movies):
+    print("explaination")
     explainer = lime.lime_text.LimeTextExplainer(class_names=['Similar', 'Not Similar'])
 
     explanations = []  # List to store explanations
