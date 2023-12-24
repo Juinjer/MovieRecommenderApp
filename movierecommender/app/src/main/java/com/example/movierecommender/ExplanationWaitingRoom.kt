@@ -80,7 +80,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 // Update UI components
                 Picasso.get().load(fullPosterPath).into(binding.ivRecommendedMovie)
                 var editable: Editable = Editable.Factory.getInstance().newEditable(title)
-                binding.tvRecommendationFactors.text = editable
+                binding.titleText.text = editable
                 editable = Editable.Factory.getInstance().newEditable(recommendationFactors)
                 println(editable.toString())
                 if (editable.startsWith("{")) {
@@ -112,6 +112,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 binding.ivRecommendedMovie.visibility = View.GONE
                 binding.tvRecommendedMovie.visibility = View.GONE
                 binding.tvRecommendationFactors.visibility = View.GONE
+                binding.titleText.visibility = View.GONE
                 binding.tvRecommendationExplained.visibility = View.GONE
                 binding.swLeftBtn.visibility = View.GONE
                 binding.swRightBtn.visibility = View.GONE
@@ -123,6 +124,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 binding.ivRecommendedMovie.visibility = View.VISIBLE
                 binding.tvRecommendedMovie.visibility = View.VISIBLE
                 binding.tvRecommendationFactors.visibility = View.VISIBLE
+                binding.titleText.visibility = View.VISIBLE
                 binding.tvRecommendationExplained.visibility = View.VISIBLE
                 // Update swipe button visibility
                 binding.swLeftBtn.visibility = View.GONE

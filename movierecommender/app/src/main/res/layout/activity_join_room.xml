@@ -35,6 +35,7 @@
         android:hint="Room id"
         android:inputType="number"
         android:textColor="@color/black"
+        android:backgroundTint="@color/mg_vandyke"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"

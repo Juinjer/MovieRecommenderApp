@@ -21,6 +21,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="36dp"
+        android:progressTint="@color/mg_vandyke"
+        android:thumbTint="@color/mg_vandyke"
         android:max="7"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.05"
