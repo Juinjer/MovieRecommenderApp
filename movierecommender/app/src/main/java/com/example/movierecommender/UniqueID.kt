@@ -1,6 +1,7 @@
 package com.example.movierecommender
 
 import android.app.Application
+import androidx.appcompat.app.AppCompatDelegate
 
 class UniqueID : Application() {
     var uniqueId: String = ""
@@ -10,5 +11,10 @@ class UniqueID : Application() {
     fun setUniqueId(id: String) {
         uniqueId = id
         initialized = true
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
     }
 }
