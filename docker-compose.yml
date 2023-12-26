@@ -1,0 +1,15 @@
+version: '3'
+services:
+  recommender:
+    build: recommender/
+    image: juinjer/recommender:1.0
+    ports:
+      - "8000:8000"
+  backend:
+    build: backend/
+    image: juinjer/node_backend:1.0
+    ports:
+      - "9999:9999"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
