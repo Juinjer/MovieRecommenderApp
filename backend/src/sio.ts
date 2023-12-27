@@ -56,10 +56,13 @@ io.on('connection', (socket: Socket) => {
 	socket.on('joinRoom', (message: string) => {
 		const args = message.split(",");
 		connections.set(args[1], socket);
+        console.log(`joinroom, ${message}`)
 
         const room:Room|null = findRoom(parseInt(args[0]));
         if(room == null){
             socket.emit("jrRes", "404", "404");
+        } else if (room.getStatus() === true) {
+            socket.emit("jrRes", "999", "999");
         } else{
             for (const member of room.getMembers()) {
                 const soc = connections.get(member);
@@ -97,8 +100,10 @@ io.on('connection', (socket: Socket) => {
             socket.emit("jrRes", "404", "404");
         } else{
 			if (room.getHost() === args[1]) {
+                room.start();
 				for (const mem of room.getMembers()) {
 					let sock = connections.get(mem);
+                    console.log("testMember")
 					sock?.emit("hostStart");
 				}
 			}
