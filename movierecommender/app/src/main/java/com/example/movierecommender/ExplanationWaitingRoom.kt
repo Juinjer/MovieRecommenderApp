@@ -1,5 +1,6 @@
 package com.example.movierecommender
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.movierecommender.databinding.ExplanationWaitingRoomBinding
 import android.os.Bundle
@@ -37,23 +38,23 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ExplanationWaitingRoomBinding.inflate(layoutInflater)
-        gestureDetector = GestureDetector(this, this);
+        gestureDetector = GestureDetector(this, this)
         setContentView(binding.root)
         mSocket = SocketHandler.getSocket()!!
-        updateLoadingState(true);
+        updateLoadingState(true)
         var loaded = false
 
         val b = intent.extras
         roomId = "404"
         if (b != null) {
             roomId = b.getString("roomcode")!!
-            Log.d("ExplanationWaitingRoom", "Room ID: $roomId");
+            Log.d("ExplanationWaitingRoom", "Room ID: $roomId")
         }
 
         id = (application as UniqueID).uniqueId
 
         mSocket.on("processingDone") { args ->
-            Log.d("ExplanationWaitingRoom", "Processing done");
+            Log.d("ExplanationWaitingRoom", "Processing done")
             val jsonArray = JSONArray(args[0].toString())
 
             for (i in 0 until jsonArray.length()) {
@@ -66,7 +67,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 recommendationBuffer.add(Movie(index, title, overview, fullPosterPath, explanation))
             }
             updateLoadingState(false)
-            displayRecommendation(recommendationBuffer[0]);
+            displayRecommendation(recommendationBuffer[0])
             loaded = true
         }
         binding.swLeftBtn.setOnClickListener(View.OnClickListener {
@@ -76,6 +77,12 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
         binding.swRightBtn.setOnClickListener(View.OnClickListener {
             if (loaded)
                 handleNext()
+        })
+        binding.exit.setOnClickListener(View.OnClickListener {
+            val data = listOf(roomId, id)
+            mSocket.emit("leaveRoom", data.joinToString(","))
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
         })
     }
 
@@ -101,12 +108,11 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                         binding.tvRecommendationExplained.text = keysString
                     } catch (e: JSONException) {
                         e.printStackTrace()
-                        "Tried to parse a JSON string, but it didn't work."
                     }
                 } else {
                     binding.tvRecommendationExplained.text = editable
                 }
-                var recommendationTitle = "Recommendation #" + (currentRecommendationIndex + 1)
+                val recommendationTitle = "Recommendation #" + (currentRecommendationIndex + 1)
                 binding.tvRecommendedMovie.text = recommendationTitle
             }
         }

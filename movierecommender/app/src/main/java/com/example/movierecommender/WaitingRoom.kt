@@ -42,7 +42,6 @@ class WaitingRoom : AppCompatActivity() {
             val roomID = binding.roomId.text.toString()
             val data = listOf(roomID, id)
             mSocket?.emit("leaveRoom", data.joinToString(","))
-            //TODO after joining false room, no way back to homescreen...
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         })
