@@ -41,6 +41,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
         setContentView(binding.root)
         mSocket = SocketHandler.getSocket()!!
         updateLoadingState(true);
+        var loaded = false
 
         val b = intent.extras
         roomId = "404"
@@ -66,7 +67,16 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
             }
             updateLoadingState(false)
             displayRecommendation(recommendationBuffer[0]);
+            loaded = true
         }
+        binding.swLeftBtn.setOnClickListener(View.OnClickListener {
+            if (loaded)
+                handlePrevious()
+        })
+        binding.swRightBtn.setOnClickListener(View.OnClickListener {
+            if (loaded)
+                handleNext()
+        })
     }
 
     private fun displayRecommendation(recommendation: Movie) {

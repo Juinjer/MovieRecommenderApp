@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(false)
             setDisplayShowHomeEnabled(true)
         }
+        val uuid = generateID()
 
         binding.create.setOnClickListener(View.OnClickListener() {
             var crIdReceived = false
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity() {
             SocketHandler.setSocket("http://$endpoint")
             SocketHandler.establishConnection()
             val mSocket = SocketHandler.getSocket()
-            mSocket?.emit("createRoom", generateID())
+            mSocket?.emit("createRoom", uuid)
 
             handler.postDelayed({
                 if (!crIdReceived) {
@@ -46,9 +47,9 @@ class MainActivity : AppCompatActivity() {
             }, 2000L) // 2 sec delay if server doesn't respond
             mSocket?.on("crId") { args ->
                 crIdReceived = true
-                val id = args[0].toString()
+                val rid = args[0].toString()
                 val b = Bundle()
-                b.putString("rId", id)
+                b.putString("rId", rid)
                 val intent = Intent(this, CreateRoom::class.java)
                 intent.putExtras(b)
                 startActivity(intent)

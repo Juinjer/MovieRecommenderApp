@@ -33,8 +33,6 @@ class CreateRoom : AppCompatActivity() {
         binding = ActivityCreateRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val toolbar: Toolbar = binding.createRoomToolbar.root
-        setSupportActionBar(toolbar)
         supportActionBar?.apply {
             title = getString(R.string.app_name)
             setDisplayHomeAsUpEnabled(true)
@@ -55,7 +53,6 @@ class CreateRoom : AppCompatActivity() {
         val id = (application as UniqueID).uniqueId
         val data = listOf(roomId, id)
         b?.putString("roomcode", roomId)
-        mSocket.emit("startLobby", data.joinToString(","))
 
         binding.cancel.setOnClickListener(View.OnClickListener() {
             val intent = Intent(this, MainActivity::class.java)
@@ -65,6 +62,7 @@ class CreateRoom : AppCompatActivity() {
             val intent = Intent(this, SwipeScreen::class.java)
             intent.putExtra("roomcode", roomId)
             startActivity(intent)
+            mSocket.emit("startLobby", data.joinToString(","))
         })
         binding.settings.setOnClickListener(View.OnClickListener {
             val intent = Intent(this, SettingsScreen::class.java)
