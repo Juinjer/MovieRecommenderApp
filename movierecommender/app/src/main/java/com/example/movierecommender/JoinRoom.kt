@@ -17,6 +17,9 @@ import com.example.movierecommender.databinding.ActivityJoinRoomBinding
 
 class JoinRoom : AppCompatActivity() {
     private lateinit var binding: ActivityJoinRoomBinding
+    private val errorMessages: Map<String,String> = mapOf(
+        "404" to "A room with this roomcode does not exist",
+        "999" to "The provided room has already started")
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +45,7 @@ class JoinRoom : AppCompatActivity() {
             mSocket?.emit("joinRoom", data.joinToString(","))
 
             mSocket?.on("jrRes") { args ->
-                if (args[1].toString() != "404"){
+                if (args[1].toString() !in errorMessages.keys){
                     val b = Bundle()
                     b.putString("members", args[0].toString())
                     b.putString("roomcode", args[1].toString())
@@ -52,7 +55,7 @@ class JoinRoom : AppCompatActivity() {
                 }
                 else {
                     handler.postDelayed({
-                        Toast.makeText(applicationContext, "A room with this roomcode ${roomId} does not exist",
+                        Toast.makeText(applicationContext, errorMessages[args[1].toString()],
                             Toast.LENGTH_SHORT).show()
                     }, 200L)
                 }
