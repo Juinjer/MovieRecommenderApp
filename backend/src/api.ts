@@ -1,63 +1,7 @@
 import * as request from 'request';
 import {Movie} from './interfaces'
-/*
-export async function getRandomMovies(numberOfMovies: number) {
-    const response = await fetch(`http://localhost:8000/random/${numberOfMovies}`, {
-        method: 'GET',
-    });
 
-    const randomMoviesJSON = await response.json();
-    console.log(randomMoviesJSON)
-    const jsonArray = [];
-
-    for (let i = 0; i < randomMoviesJSON.movies.length; i++) {
-        const movie = randomMoviesJSON.movies[i];
-        const img = movie.full_poster_path;
-        const title = movie.title;
-        const desc = movie.overview;
-
-        const movieObject = {
-            img: img,
-            title: title,
-            desc: desc,
-        };
-        jsonArray.push(movieObject);
-    }
-
-    // Print or use jsonArray as needed
-    console.log(jsonArray);
-    return jsonArray;
-}
-
-export async function getSimpleRecommendation(movieTitle: string) {
-
-    const response = await fetch('http://localhost:8000/simple_recommendation', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({"title": movieTitle }),
-    });
-
-    const similarMoviesJSON = await response.json();
-    console.log(similarMoviesJSON)
-    return similarMoviesJSON;
-}
-
-export async function getFullRecommendation(movieTitle:string){
-    const response = await fetch('http://localhost:8000/full_recommendation', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({"title": movieTitle }),
-    });
-    const fullRecommendationJSON = await response.json();
-    console.log(fullRecommendationJSON)
-    return fullRecommendationJSON;
-}
-*/
-
+const endpoint = process.env.REC || "127.0.0.1";
 /**
  * Retrieves movie suggestions based on the provided movie title.
  *
@@ -66,7 +10,7 @@ export async function getFullRecommendation(movieTitle:string){
  */
 export async function getSuggestions(movieTitle: string): Promise<Movie[]>{
     try {
-        const response = await fetch('http://localhost:8000/full_recommendation', {
+        const response = await fetch(`http://${endpoint}:8000/full_recommendation`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -75,11 +19,11 @@ export async function getSuggestions(movieTitle: string): Promise<Movie[]>{
         });
 
         if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
+          console.error(`Request failed with status ${response.status}`);
+            //throw new Error(`Request failed with status ${response.status}`);
         }
 
         const responseJSON = await response.json();
-        //console.log(fullRecommendationJSON);
         const suggestions: Movie[] = responseJSON.recommendations.map((movie: any) => {
             // Map each movie to a Movie object
             return {
@@ -93,7 +37,9 @@ export async function getSuggestions(movieTitle: string): Promise<Movie[]>{
 
         return suggestions;
     } catch (error) {
-        throw new Error(`Error fetching movie suggestions: ${error}`);
+        console.log("test");
+        console.error(error);
+        return [];
     }
 }
 
@@ -106,7 +52,7 @@ export async function getSuggestions(movieTitle: string): Promise<Movie[]>{
  */
 export async function getSuggestionsRandom(numberOfSuggestions: number): Promise<Movie[]> {
     try{
-        const response = await fetch(`http://127.0.0.1:8000/random/${numberOfSuggestions}`, {
+        const response = await fetch(`http://${endpoint}:8000/random/${numberOfSuggestions}`, {
             method: 'GET',
         });
         const responseJSON = await response.json();
@@ -122,6 +68,8 @@ export async function getSuggestionsRandom(numberOfSuggestions: number): Promise
 
         return suggestions;
     } catch (error) {
-        throw new Error(`Error fetching movie suggestions: ${error}`);
+        console.log("test");
+        console.error(error);
+        return [];
     }
 }

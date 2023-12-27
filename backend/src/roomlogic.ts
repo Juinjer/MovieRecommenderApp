@@ -8,9 +8,10 @@ export class Room {
     private members: string[];
     private names: Map<string, string>;
 
+    private status: boolean = false;
     private numberOfRecommendations: number = 5;
     private numberOfSwipes: number = 3;
-    private likeThreshold:number = 0.75;
+    private likeThreshold: number = 0.75;
 
     private nextSuggestions: Movie[] = [];
     private movieRatings: Map<Movie, MovieRating[]> = new Map<Movie, MovieRating[]>()
@@ -80,6 +81,7 @@ export class Room {
 
     //Potential for concurrency problems!
     async addMovieRating(movie: Movie, rating: MovieRating): Promise<void>{
+        //console.log(movie, rating);
         let ratings: MovieRating[] = this.movieRatings.get(movie) || [];
         ratings.push(rating); // This is safe because ratings is guaranteed to be an array
         this.movieRatings.set(movie, ratings);
@@ -91,7 +93,7 @@ export class Room {
             for( const movie of liked) {
                 this.topRecommendation = this.topRecommendation.concat(movie);
                 this.topRecommendation = this.topRecommendation.concat(await getSuggestions(movie.title));
-                console.log('liked', movie, 'recommended', this.topRecommendation);
+                //console.log('liked', movie, 'recommended', this.topRecommendation);
             }
             notifyProcessingDone(this.members, this.topRecommendation);
         }
@@ -156,5 +158,11 @@ export class Room {
 
     setNSwipes(n: number): void {
         this.numberOfSwipes = n;
+    }
+    getStatus() {
+        return this.status;
+    }
+    start() {
+        this.status = true;
     }
 }
