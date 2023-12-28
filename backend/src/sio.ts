@@ -31,7 +31,6 @@ export function notifyProcessingDone(roomMembers: string[], suggestions:Movie[])
         // Iterate through the members of the room and retrieve their sockets from the connections map
         for (const member of roomMembers) {
             const socket = connections.get(member)!!;
-            console.log(suggestionsJSON);
             socket.emit('processingDone', suggestionsJSON);
         }
     } else {
@@ -71,13 +70,12 @@ io.on('connection', (socket: Socket) => {
         } else if (room.getStatus() === true) {
             socket.emit("jrRes", "999", "999");
         } else{
+            room.addMember(args[1]);
             for (const member of room.getMembers()) {
                 const soc = connections.get(member);
                 soc?.emit("joinNotif", room.getNames().get(args[1]));
             }
 
-            room.addMember(args[1]);
-            //console.log("members " + room.getMembers().toString() + " names " + Array.from(room.getNames()).toString());
             socket.emit("jrRes", Array.from(room.getNames().values()).toString(), `${room.getRoomId()}`);
         }
     });
