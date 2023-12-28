@@ -37,7 +37,6 @@ export class Room {
   */
         (async () => {
             this.nextSuggestions = await getSuggestionsRandom(this.numberOfSwipes);
-            //console.log('Room suggestions:', this.nextSuggestions);
         })();
     }
 
@@ -158,6 +157,9 @@ export class Room {
 
     setNSwipes(n: number): void {
         this.numberOfSwipes = n;
+        (async () => {
+            this.nextSuggestions = await getSuggestionsRandom(this.numberOfSwipes);
+        })();
     }
     getStatus() {
         return this.status;
