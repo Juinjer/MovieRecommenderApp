@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.view.View
-import androidx.core.content.ContextCompat
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movierecommender.databinding.WaitingRoomBinding
@@ -22,6 +24,8 @@ class WaitingRoom : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val mSocket = SocketHandler.getSocket()
 
+        val handler = Handler(Looper.getMainLooper())
+
         binding = WaitingRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val b = intent.extras
@@ -35,6 +39,17 @@ class WaitingRoom : AppCompatActivity() {
             b.putString("roomcode", binding.roomId.text.toString())
             val intent = Intent(this, SwipeScreen::class.java)
             intent.putExtras(b)
+            startActivity(intent)
+        }
+        mSocket?.on("disbandgroup") { _ ->
+            handler.post {
+                Toast.makeText(
+                    applicationContext, "Group host disbanded the group",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            val intent = Intent(this, JoinRoom::class.java)
+            mSocket.disconnect()
             startActivity(intent)
         }
         binding.cancel.setOnClickListener(View.OnClickListener() {

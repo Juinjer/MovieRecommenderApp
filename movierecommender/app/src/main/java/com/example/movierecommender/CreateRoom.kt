@@ -48,6 +48,7 @@ class CreateRoom : AppCompatActivity() {
             val editable: Editable = Editable.Factory.getInstance().newEditable(s)
             binding.roomidnumber.text = editable
         }
+        mSocket.off("disbandgroup") // to avoid weird behaviour
 
         val roomId = binding.roomidnumber.text.toString()
         val id = (application as UniqueID).uniqueId
@@ -56,6 +57,7 @@ class CreateRoom : AppCompatActivity() {
 
         binding.cancel.setOnClickListener(View.OnClickListener() {
             val intent = Intent(this, MainActivity::class.java)
+            mSocket.emit("leaveRoom", data.joinToString(","))
             startActivity(intent)
         })
         binding.start.setOnClickListener(View.OnClickListener {

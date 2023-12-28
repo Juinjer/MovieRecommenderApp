@@ -135,6 +135,7 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     private fun showExplanationScreen() {
         val intent = Intent(this, ExplanationWaitingRoom::class.java)
+        intent.putExtra("roomcode",roomId)
         startActivity(intent)
     }
 
