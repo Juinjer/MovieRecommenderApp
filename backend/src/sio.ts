@@ -8,6 +8,13 @@ const io = new SocketIOServer(server);
 
 const roomList: Room[] = [];
 const connections = new Map<string, Socket>();
+function removeRoom(roomId:number) {
+    for(let i = 0; i<roomList.length;i++){
+        if(roomList[i].getRoomId() == roomId){
+            roomList.splice(i,i);
+        }
+    }
+}
 
 function findRoom(roomId:number): Room|null{
     for(const room of roomList){
@@ -28,7 +35,7 @@ export function notifyProcessingDone(roomMembers: string[], suggestions:Movie[])
             socket.emit('processingDone', suggestionsJSON);
         }
     } else {
-        throw new Error(`error in emitting to room members`);
+        console.error("error in emitting to room members");
     }
 }
 
@@ -78,16 +85,24 @@ io.on('connection', (socket: Socket) => {
 	socket.on('leaveRoom', (message: string) => {
 		const args = message.split(",");
 
+        console.log("leaveRoom received");
 		const room:Room|null = findRoom(parseInt(args[0]));
         if(room == null){
             socket.emit("jrRes", "404", "404");
         } else{
             for (const member of room.getMembers()) {
                 const soc = connections.get(member);
-                soc?.emit("leaveNotif", room.getNames().get(args[1]));
+                if (args[1]===room.getHost()) {
+                    soc?.emit("disbandgroup");
+                } else {
+                    soc?.emit("leaveNotif", room.getNames().get(args[1]));
+                }
             }
-
-            room.removeMember(args[1]);
+            if (args[1]===room.getHost()) {
+                removeRoom(parseInt(args[0]));
+            } else {
+                room.removeMember(args[1]);
+            }
             socket.disconnect();
         }
 	});
@@ -141,6 +156,8 @@ io.on('connection', (socket: Socket) => {
     /*
     socket.on('getMovies', async (numberOfMovies: number) => {
         let movieDetails = await getSuggestionsRandom(numberOfMovies);
+        console.log("testMovieResp");
+        console.log(`${movieDetails}`);
         socket.emit('getMoviesResp', movieDetails);
         //const room:Room = findRoom( parseInt(message));        
         // socket.emit('getMoviesResp', await room.getNextMovies());
