@@ -1,10 +1,16 @@
 package com.example.movierecommender
 
 import android.content.Intent
+import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import com.example.movierecommender.databinding.ExplanationWaitingRoomBinding
 import android.os.Bundle
 import android.text.Editable
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.StyleSpan
 import android.util.Log
 import android.widget.TextView
 import android.view.GestureDetector
@@ -102,10 +108,24 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 binding.titleText.text = editable
                 editable = Editable.Factory.getInstance().newEditable(recommendationFactors)
                 println("CONTENT = $editable")
+
+
+
+
                 if (editable.startsWith("{")) {
                     try {
                         val jsonObject = JSONObject(editable.toString())
                         val keysList = jsonObject.keys().asSequence().map { it.toString() }.toList()
+                        val importanceToFontSize = mapOf(
+                            -0.04 to 26f,
+                            -0.03 to 24f,
+                            -0.02 to 22f,
+                            -0.01 to 20f,
+                            0.0 to 18f,
+                            0.01 to 16f,
+                            0.02 to 14f
+                        )
+
                         fun capitalizeFirstLetter(str: String): String {
                             return if (str.isNotEmpty()) {
                                 str.substring(0, 1).toUpperCase() + str.substring(1)
@@ -123,15 +143,70 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                         }
                         val sortedKeys = TreeSet(caseInsensitiveComparator)
                         sortedKeys.addAll(capitalizedKeysList)
-                        val keysString = sortedKeys.joinToString(", ")
-                        binding.tvRecommendationExplained.text = keysString
-                        println(keysString)
+                        val spannableStringBuilder = SpannableStringBuilder()
+                        for (key in sortedKeys) {
+                            val importance = jsonObject.optDouble(key, 0.0)
+                            val fontSize = importanceToFontSize[importance] ?: 20f
+                            val isBold = importance <= -0.0125
+                            val spannableString = SpannableString("$key, ")
+                            spannableString.setSpan(
+                                AbsoluteSizeSpan(fontSize.toInt(), true),
+                                0,
+                                spannableString.length,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
+                            if (isBold) {
+                                spannableString.setSpan(
+                                    StyleSpan(Typeface.BOLD),
+                                    0,
+                                    spannableString.length,
+                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                )
+                            }
+                            spannableStringBuilder.append(spannableString)
+                        }
+                        spannableStringBuilder.delete(
+                            spannableStringBuilder.length - 2,
+                            spannableStringBuilder.length
+                        )
+                        binding.tvRecommendationExplained.text = spannableStringBuilder
                     } catch (e: JSONException) {
                         e.printStackTrace()
                     }
                 } else {
                     binding.tvRecommendationExplained.text = editable
                 }
+
+//                if (editable.startsWith("{")) {
+//                    try {
+//                        val jsonObject = JSONObject(editable.toString())
+//                        val keysList = jsonObject.keys().asSequence().map { it.toString() }.toList()
+//                        fun capitalizeFirstLetter(str: String): String {
+//                            return if (str.isNotEmpty()) {
+//                                str.substring(0, 1).toUpperCase() + str.substring(1)
+//                            } else {
+//                                str
+//                            }
+//                        }
+//
+//                        val capitalizedKeysList = keysList.map { capitalizeFirstLetter(it) }
+//                        val caseInsensitiveComparator = Comparator<String> { str1, str2 ->
+//                            str1.compareTo(
+//                                str2,
+//                                ignoreCase = true
+//                            )
+//                        }
+//                        val sortedKeys = TreeSet(caseInsensitiveComparator)
+//                        sortedKeys.addAll(capitalizedKeysList)
+//                        val keysString = sortedKeys.joinToString(", ")
+//                        binding.tvRecommendationExplained.text = keysString
+//                        println(keysString)
+//                    } catch (e: JSONException) {
+//                        e.printStackTrace()
+//                    }
+//                } else {
+//                    binding.tvRecommendationExplained.text = editable
+//                }
                 val recommendationTitle = "Recommendation #" + (currentRecommendationIndex + 1)
                 binding.tvRecommendedMovie.text = recommendationTitle
             }
