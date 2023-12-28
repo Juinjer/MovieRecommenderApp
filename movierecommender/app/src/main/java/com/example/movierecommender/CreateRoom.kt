@@ -9,6 +9,8 @@ import android.content.Intent
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.util.Log
 import android.view.View
@@ -18,14 +20,20 @@ import com.example.movierecommender.databinding.ActivityCreateRoomBinding
 import androidmads.library.qrgenearator.QRGContents;
 import androidmads.library.qrgenearator.QRGEncoder;
 import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import java.lang.Exception
 import java.lang.Integer.min
+import kotlin.random.Random
 
 class CreateRoom : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreateRoomBinding
-    private lateinit var qrgEncoder: QRGEncoder
-    private lateinit var bitmap: Bitmap
+//    private lateinit var qrgEncoder: QRGEncoder
+//    private lateinit var bitmap: Bitmap
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var nameList: ArrayList<Name>
+    private lateinit var nameAdapter: NameAdapter
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,11 +41,7 @@ class CreateRoom : AppCompatActivity() {
         binding = ActivityCreateRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        supportActionBar?.apply {
-            title = getString(R.string.app_name)
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowHomeEnabled(true)
-        }
+        val handler = Handler(Looper.getMainLooper())
 
         val mSocket = SocketHandler.getSocket()!!
 
@@ -78,27 +82,55 @@ class CreateRoom : AppCompatActivity() {
             clipboard.setPrimaryClip(clip)
         })
 
-        displayQR()
-    }
+        //TODO: should make some class to handle this member logic
 
-    fun Context.hideKeyboard(view: View) {
-        val inputMethodManager =
-            getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-    }
+        val imageResources = arrayOf(
+            R.drawable.alligator,
+            R.drawable.bat,
+            R.drawable.cormorant,
+            R.drawable.coyote,
+            R.drawable.dinosaur,
+            R.drawable.elephant,
+            R.drawable.giraffe,
+            R.drawable.kangaroo,
+            R.drawable.llama,
+            R.drawable.penguin,
+            R.drawable.raccoon
+        )
 
-    fun displayQR() {
-        val dim = min(binding.idIVQrcode.layoutParams.width, binding.idIVQrcode.layoutParams.height)
-        val uri = "http://example.com/${binding.roomidnumber}"
-        qrgEncoder = QRGEncoder(uri, null, QRGContents.Type.TEXT, dim)
-        //TODO: image always has padding, dunno why
-        // --> Zwarte rand door generator, aanpassing padding geen verschil
-        // binding.idIVQrcode.setPadding(0, 0, 0, 0)
-        try {
-            bitmap = qrgEncoder.bitmap
-            binding.idIVQrcode.setImageBitmap(bitmap)
-        } catch (e: Exception) {
-            e.printStackTrace()
+        mSocket.on("joinNotif") { args ->
+            nameList.add(Name(imageResources[Random.nextInt(imageResources.size)], args[0].toString()))
+            handler.post { updateList() }
+        }
+
+        mSocket.on("leaveNotif") { args ->
+            for (i in 0..<nameList.size) {
+                if (nameList[i].name == args[0].toString()){
+                    nameList.removeAt(i)
+                }
+            }
+            handler.post { updateList() }
+        }
+        recyclerView = binding.recyclerView
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        nameList = ArrayList()
+
+        if (b != null) {
+            Log.d("test", b.getString("members")!!)
+            val s = b.getString("members")!!
+            val splitted = s.split(",")
+            imageResources.shuffle()
+            for ((index, st) in splitted.withIndex()) {
+                nameList.add(Name(imageResources[index], st))
+            }
+            updateList()
         }
     }
+
+    fun updateList() {
+        this.nameAdapter = NameAdapter(this.nameList)
+        recyclerView.adapter = this.nameAdapter
+    }
+
 }

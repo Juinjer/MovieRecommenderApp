@@ -47,8 +47,9 @@ class MainActivity : AppCompatActivity() {
             }, 2000L) // 2 sec delay if server doesn't respond
             mSocket?.on("crId") { args ->
                 crIdReceived = true
-                val rid = args[0].toString()
+                val rid = args[1].toString()
                 val b = Bundle()
+                b.putString("members", args[0].toString())
                 b.putString("rId", rid)
                 val intent = Intent(this, CreateRoom::class.java)
                 intent.putExtras(b)

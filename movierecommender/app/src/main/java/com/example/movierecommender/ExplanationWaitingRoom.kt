@@ -62,7 +62,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
             roomId = b.getString("roomcode")!!
             Log.d("ExplanationWaitingRoom", "Room ID: $roomId")
         }
-
+        mSocket.off("disbandgroup") // to avoid weird behaviour
         id = (application as UniqueID).uniqueId
 
         mSocket.on("processingDone") { args ->
