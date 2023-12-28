@@ -18,6 +18,7 @@ import org.json.JSONObject
 import android.widget.Toast
 import org.json.JSONArray
 import org.json.JSONException
+import java.util.TreeSet
 import kotlin.math.abs
 
 
@@ -99,13 +100,31 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 var editable: Editable = Editable.Factory.getInstance().newEditable(title)
                 binding.titleText.text = editable
                 editable = Editable.Factory.getInstance().newEditable(recommendationFactors)
-                println(editable.toString())
+                println("CONTENT = $editable")
                 if (editable.startsWith("{")) {
                     try {
                         val jsonObject = JSONObject(editable.toString())
-                        val keysList = jsonObject.keys().asSequence().toList()
-                        val keysString = keysList.joinToString(", ")
+                        val keysList = jsonObject.keys().asSequence().map { it.toString() }.toList()
+                        fun capitalizeFirstLetter(str: String): String {
+                            return if (str.isNotEmpty()) {
+                                str.substring(0, 1).toUpperCase() + str.substring(1)
+                            } else {
+                                str
+                            }
+                        }
+
+                        val capitalizedKeysList = keysList.map { capitalizeFirstLetter(it) }
+                        val caseInsensitiveComparator = Comparator<String> { str1, str2 ->
+                            str1.compareTo(
+                                str2,
+                                ignoreCase = true
+                            )
+                        }
+                        val sortedKeys = TreeSet(caseInsensitiveComparator)
+                        sortedKeys.addAll(capitalizedKeysList)
+                        val keysString = sortedKeys.joinToString(", ")
                         binding.tvRecommendationExplained.text = keysString
+                        println(keysString)
                     } catch (e: JSONException) {
                         e.printStackTrace()
                     }
