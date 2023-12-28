@@ -11,7 +11,7 @@ const connections = new Map<string, Socket>();
 function removeRoom(roomId:number) {
     for(let i = 0; i<roomList.length;i++){
         if(roomList[i].getRoomId() == roomId){
-            roomList.splice(i,i);
+            roomList.splice(i,1);
         }
     }
 }
@@ -48,14 +48,14 @@ io.on('connection', (socket: Socket) => {
 		find: {
 			for (const room of roomList) {
 				if (message === room.getHost()) {
-					socket.emit("crId", `${room.getRoomId()}`);
+                    socket.emit("crId", Array.from(room.getNames().values()).toString(), `${room.getRoomId()}`);
 					break find;
 				}
 			}
 
 			const room = new Room(message);
 			roomList.push(room);
-			socket.emit("crId", `${room.getRoomId()}`);
+            socket.emit("crId", Array.from(room.getNames().values()).toString(), `${room.getRoomId()}`);
 		}
 	});
 
@@ -91,6 +91,7 @@ io.on('connection', (socket: Socket) => {
             for (const member of room.getMembers()) {
                 const soc = connections.get(member);
                 if (args[1]===room.getHost()) {
+                    console.log("disbandgroup");
                     soc?.emit("disbandgroup");
                 } else {
                     soc?.emit("leaveNotif", room.getNames().get(args[1]));
