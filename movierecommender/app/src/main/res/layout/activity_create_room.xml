@@ -34,11 +34,11 @@
         android:id="@+id/id"
         android:layout_width="58dp"
         android:layout_height="19dp"
-        android:layout_marginStart="97dp"
-        android:layout_marginTop="109dp"
-        android:layout_marginEnd="256dp"
-        android:text="Room id:"
+        android:layout_marginTop="20dp"
+        android:text="Room id"
         android:textColor="@color/mg_vandyke"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/roomidnumber"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -47,8 +47,7 @@
         android:id="@+id/roomidnumber"
         android:layout_width="100dp"
         android:layout_height="42dp"
-        android:layout_marginStart="155dp"
-        android:layout_marginEnd="156dp"
+        android:layout_marginBottom="20dp"
         android:backgroundTint="@color/mg_vandyke"
         android:clickable="false"
         android:cursorVisible="false"
@@ -57,38 +56,40 @@
         android:text="1 2 3 4 5 6"
         android:textAlignment="center"
         android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@+id/settings"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/id" />
+
+    <Button
+        android:id="@+id/settings"
+        android:layout_width="107dp"
+        android:layout_height="43dp"
+        android:layout_marginStart="152dp"
+        android:layout_marginEnd="152dp"
+        android:layout_marginBottom="61dp"
+        android:text="Settings"
+        app:layout_constraintBottom_toTopOf="@+id/idIVQrcode"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/id" />
+        app:layout_constraintTop_toBottomOf="@+id/roomidnumber"
+        app:layout_constraintWidth_percent="0.4" />
 
     <Button
         android:id="@+id/copyBtn"
         android:layout_width="100dp"
         android:layout_height="30dp"
-        android:layout_marginStart="285dp"
-        android:layout_marginTop="109dp"
-        android:layout_marginEnd="26dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="38dp"
         android:backgroundTint="@color/mg_rose"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="Copy"
+        app:layout_constraintBottom_toBottomOf="@+id/roomidnumber"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/settings"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="120dp"
-        android:layout_marginTop="160dp"
-        android:layout_marginEnd="126dp"
-        android:text="Settings"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.4" />
+        app:layout_constraintStart_toEndOf="@+id/roomidnumber"
+        app:layout_constraintTop_toTopOf="@+id/roomidnumber" />
 
     <TextView
         android:id="@+id/qrtext"

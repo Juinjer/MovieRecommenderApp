@@ -10,8 +10,6 @@ import android.widget.TextView
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Button
-import com.example.movierecommender.databinding.SwipeScreenBinding
 import com.squareup.picasso.Picasso
 import io.socket.client.Socket
 import org.json.JSONObject
@@ -35,12 +33,15 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
     // Buffer information for recommendations
     private val recommendationBuffer = mutableListOf<Movie>()
     private var currentRecommendationIndex = 0
+    var scrollingText: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ExplanationWaitingRoomBinding.inflate(layoutInflater)
         gestureDetector = GestureDetector(this, this)
         setContentView(binding.root)
+        val scrollingText: TextView = findViewById(R.id.titleText)
+        scrollingText.isSelected = true
         mSocket = SocketHandler.getSocket()!!
         updateLoadingState(true)
         var loaded = false
