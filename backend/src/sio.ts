@@ -24,7 +24,7 @@ export function notifyProcessingDone(roomMembers: string[], suggestions:Movie[])
         // Iterate through the members of the room and retrieve their sockets from the connections map
         for (const member of roomMembers) {
             const socket = connections.get(member)!!;
-            //console.log(suggestionsJSON);
+            console.log(suggestionsJSON);
             socket.emit('processingDone', suggestionsJSON);
         }
     } else {

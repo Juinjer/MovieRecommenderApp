@@ -10,6 +10,7 @@ const endpoint = process.env.REC || "127.0.0.1";
  */
 export async function getSuggestions(movieTitle: string): Promise<Movie[]>{
     try {
+        console.log("Test");
         const response = await fetch(`http://${endpoint}:8000/full_recommendation`, {
             method: 'POST',
             headers: {

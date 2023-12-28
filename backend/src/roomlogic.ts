@@ -72,7 +72,7 @@ export class Room {
     isAllRatingsSubmitted(): boolean{
         const totalAmountRatings = Array.from(this.movieRatings.values()).length;
         const expectedTotalRatings = this.members.length * this.numberOfSwipes;
-
+        console.log("TeET");
         //console.log(totalAmountRatings, expectedTotalRatings);
         // uses modulo because this allows us to check for multiple rounds
         return totalAmountRatings % expectedTotalRatings === 0;
@@ -88,12 +88,13 @@ export class Room {
         if( this.isAllRatingsSubmitted()){
             const liked = this.getMoviesOverLikeThreshold();
 
-            //console.log("LikedMovies",JSON.stringify(liked))
+            console.log("LikedMovies",JSON.stringify(liked))
             for( const movie of liked) {
                 this.topRecommendation = this.topRecommendation.concat(movie);
                 this.topRecommendation = this.topRecommendation.concat(await getSuggestions(movie.title));
                 //console.log('liked', movie, 'recommended', this.topRecommendation);
             }
+            console.log(this.topRecommendation);
             notifyProcessingDone(this.members, this.topRecommendation);
         }
     }
