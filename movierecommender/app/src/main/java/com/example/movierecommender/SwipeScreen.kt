@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.movierecommender.databinding.SwipeScreenBinding
 import com.squareup.picasso.Picasso
@@ -15,10 +16,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.math.abs
 
+
 class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
     private lateinit var binding: SwipeScreenBinding
-    private lateinit var roomId:String
-    private lateinit var id:String
+    private lateinit var roomId: String
+    private lateinit var id: String
     private lateinit var mSocket: Socket
 
     // Declaring gesture detector, swipe threshold, and swipe velocity threshold
@@ -30,12 +32,15 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
     // Buffer information for movies
     private val movieBuffer = mutableListOf<Movie>()
     private var currentMovieIndex = 0
+    var scrollingText: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = SwipeScreenBinding.inflate(layoutInflater)
         gestureDetector = GestureDetector(this, this);
         setContentView(binding.root)
+        val scrollingText: TextView = findViewById(R.id.titleText)
+        scrollingText.isSelected = true
         mSocket = SocketHandler.getSocket()!!
 
         val b = intent.extras
@@ -50,14 +55,14 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
 
         // Binding event listeners to the rating buttons
         binding.likeBtn.setOnClickListener(View.OnClickListener {
-           handleLike();
+            handleLike();
         })
         binding.dislikeBtn.setOnClickListener(View.OnClickListener {
             handleDislike();
         })
     }
 
-    private fun fetchMovies(){
+    private fun fetchMovies() {
         mSocket.emit("getSuggestions", roomId)
         mSocket.on("getSuggestionsResp") { args ->
             val jsonArray = JSONArray(args[0].toString())
@@ -69,7 +74,7 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
                 val fullPosterPath = jsonObject.getString("full_poster_path")
                 val title = jsonObject.getString("title")
                 val overview = jsonObject.getString("overview")
-                movieBuffer.add( Movie(index,title, overview, fullPosterPath))
+                movieBuffer.add(Movie(index, title, overview, fullPosterPath))
             }
             displayNextMovie()
         }
@@ -97,11 +102,11 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
                 binding.filmDescription.text = editable
             }
         } else {
-                showExplanationScreen()
+            showExplanationScreen()
         }
     }
 
-    private fun handleLike(){
+    private fun handleLike() {
         val likedMovie = movieBuffer[currentMovieIndex - 1]
         val jsonString = convertMovieToJsonString(likedMovie)
 
@@ -113,10 +118,10 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     // FUTURE: Implement a skip on swiping upward
-    private fun handleSkip(){
+    private fun handleSkip() {
     }
 
-    private fun handleDislike(){
+    private fun handleDislike() {
         val dislikedMovie = movieBuffer[currentMovieIndex - 1]
         val jsonString = convertMovieToJsonString(dislikedMovie)
 
@@ -128,7 +133,7 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
 
-    private fun showExplanationScreen(){
+    private fun showExplanationScreen() {
         val intent = Intent(this, ExplanationWaitingRoom::class.java)
         startActivity(intent)
     }
@@ -146,13 +151,11 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
 
-
     // Override this method to recognize touch event
     override fun onTouchEvent(event: MotionEvent): Boolean {
         return if (gestureDetector.onTouchEvent(event)) {
             true
-        }
-        else {
+        } else {
             super.onTouchEvent(event)
         }
     }
@@ -162,7 +165,12 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
      * It uses the flingThresholds to see whether it was a valid movement.
      * It uses begin and end position to differentiate directions
      */
-    override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+    override fun onFling(
+        e1: MotionEvent?,
+        e2: MotionEvent,
+        velocityX: Float,
+        velocityY: Float
+    ): Boolean {
         try {
             val diffY = e2.y - e1!!.y
             val diffX = e2.x - e1.x
@@ -172,24 +180,21 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
                     if (diffX > 0) {
                         // Toast.makeText(applicationContext, "Left to Right swipe gesture", Toast.LENGTH_SHORT).show()
                         handleLike()
-                    }
-                    else {
+                    } else {
                         // Toast.makeText(applicationContext, "Right to Left swipe gesture", Toast.LENGTH_SHORT).show()
                         handleDislike()
                     }
                 }
-            }else{
+            } else {
                 if (abs(diffY) > flingThreshold && abs(velocityY) > flingVelocityThreshold) {
                     if (diffY > 0) {
                         // Toast.makeText(applicationContext, "Up to Down gesture", Toast.LENGTH_SHORT).show()
-                    }
-                    else {
+                    } else {
                         // Toast.makeText(applicationContext, "Down to Up swipe gesture", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
-        }
-        catch (exception: Exception) {
+        } catch (exception: Exception) {
             exception.printStackTrace()
         }
         return true
@@ -208,7 +213,12 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
         return false
     }
 
-    override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+    override fun onScroll(
+        e1: MotionEvent?,
+        e2: MotionEvent,
+        distanceX: Float,
+        distanceY: Float
+    ): Boolean {
         return false
     }
 

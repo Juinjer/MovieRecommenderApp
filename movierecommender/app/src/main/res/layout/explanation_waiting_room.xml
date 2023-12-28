@@ -12,31 +12,34 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Recommendation #?"
-        android:textSize="36sp"
+        android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/ivRecommendedMovie"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--    <TextView-->
-    <!--        android:id="@+id/titleText"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_gravity="center_vertical"-->
-    <!--        android:layout_marginTop="6dp"-->
-    <!--        android:layout_marginBottom="6dp"-->
-    <!--        android:gravity="center_vertical"-->
-    <!--        android:marqueeRepeatLimit="marquee_forever"-->
-    <!--        android:scrollHorizontally="true"-->
-    <!--        android:singleLine="true"-->
-    <!--        android:text="Movie Title"-->
-    <!--        android:textSize="20sp"-->
-    <!--        android:textStyle="bold"-->
-    <!--        app:layout_constraintBottom_toTopOf="@+id/tvRecommendationFactors"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintHorizontal_bias="0.498"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@+id/ivRecommendedMovie" />-->
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="center_vertical"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+        android:text="Movie Title"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tvRecommendationFactors"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivRecommendedMovie" />
 
     <ImageView
         android:id="@+id/ivRecommendedMovie"
@@ -48,49 +51,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <HorizontalScrollView
-        android:id="@+id/horizontalScrollView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintBottom_toTopOf="@+id/tvRecommendationFactors"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivRecommendedMovie"
-        app:layout_constraintWidth_default="wrap">
-
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="6dp"
-            android:gravity="center_vertical"
-            android:text="Movie Title"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-    </HorizontalScrollView>
-
     <TextView
         android:id="@+id/tvRecommendationFactors"
-        android:layout_width="303dp"
-        android:layout_height="21dp"
-        android:layout_marginTop="30dp"
+        android:layout_width="373dp"
+        android:layout_height="27dp"
+        android:layout_marginTop="20dp"
         android:text="Recommendation factors:"
         android:textColor="@color/black"
         android:textSize="18sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tvRecommendationExplained"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
+        app:layout_constraintTop_toBottomOf="@+id/titleText" />
 
     <TextView
         android:id="@+id/tvRecommendationExplained"
-        android:layout_width="312dp"
-        android:layout_height="116dp"
+        android:layout_width="374dp"
+        android:layout_height="73dp"
         android:text="Explanations for movie..."
         android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@+id/exit"
@@ -152,8 +130,8 @@
         android:id="@+id/exit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Exit"
         android:backgroundTint="#FF5733"
+        android:text="Exit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
