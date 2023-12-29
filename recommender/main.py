@@ -47,6 +47,22 @@ async def get_simple_recommendation(movie: Movie):
     #    logging.info({"movie_title": movie.title, "recommendations": recommendations})
     return {"movie_title": movie.title, "recommendations": recommendations}
 
+@app.post("/3nn")
+async def get_3nn(movie: Movie):
+    similar_movies = model.get_similar_movies(movie.title,3)
+    print(similar_movies);
+    recommendations = [
+        {
+            "index": index,
+            "title": title,
+            "overview": overview,
+            "full_poster_path": base_poster_url + poster_path
+        }
+        for index, (title, overview, poster_path) in similar_movies[['title', 'overview', 'poster_path']].iterrows()
+    ]
+    #    logging.info({"movie_title": movie.title, "recommendations": recommendations})
+    return {"movie_title": movie.title, "recommendations": recommendations}
+
 
 # The explanation is the intensive part
 @app.post("/full_recommendation")
