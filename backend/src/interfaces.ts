@@ -1,5 +1,6 @@
 export interface MovieRating {
   appId: string;
+  //roomId: number;
   rating: number;
 }
 

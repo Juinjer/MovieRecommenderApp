@@ -43,6 +43,40 @@ export async function getSuggestions(movieTitle: string): Promise<Movie[]>{
     }
 }
 
+export async function get3NN(movieTitle: string): Promise<Movie[]> {
+    try {
+        const response = await fetch(`http://${endpoint}:8000/3nn`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ "title": movieTitle }),
+        });
+
+        if (!response.ok) {
+          console.error(`Request failed with status ${response.status}`);
+            //throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const responseJSON = await response.json();
+        const suggestions: Movie[] = responseJSON.recommendations.map((movie: any) => {
+            // Map each movie to a Movie object
+            return {
+                index: movie.index,
+                title: movie.title,
+                overview: movie.overview,
+                full_poster_path: movie.full_poster_path
+            };
+        });
+
+        return suggestions;
+    } catch (error) {
+        console.log("test");
+        console.error(error);
+        return [];
+    }   
+}
+
 
 /**
  * Retrieves a number of random movie suggestions.

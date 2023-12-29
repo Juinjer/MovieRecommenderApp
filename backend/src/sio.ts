@@ -175,6 +175,7 @@ io.on('connection', (socket: Socket) => {
 
             const movieRating: MovieRating = {
                 appId,
+                //roomId,
                 rating,
             };
 

@@ -1,5 +1,5 @@
 import { MovieRating, Movie} from './interfaces'
-import { getSuggestions, getSuggestionsRandom} from './api';
+import { get3NN, getSuggestions, getSuggestionsRandom} from './api';
 import { notifyProcessingDone} from './sio';
 
 export class Room {
@@ -78,44 +78,114 @@ export class Room {
 
     //Potential for concurrency problems!
     async addMovieRating(movie: Movie, rating: MovieRating): Promise<void>{
+        //console.log("add rating:\n")
         //console.log(movie, rating);
         let ratings: MovieRating[] = this.movieRatings.get(movie) || [];
         ratings.push(rating); // This is safe because ratings is guaranteed to be an array
         this.movieRatings.set(movie, ratings);
 
-        if( this.isAllRatingsSubmitted()){
-            const liked = this.getMoviesOverLikeThreshold();
+        if (this.isAllRatingsSubmitted()) {
+            await this.setupRecommendations();
+        }
 
-            for( const movie of liked) {
-                this.topRecommendation = this.topRecommendation.concat(movie);
-                this.topRecommendation = this.topRecommendation.concat(await getSuggestions(movie.title));
-                //console.log('liked', movie, 'recommended', this.topRecommendation);
+        // if( this.isAllRatingsSubmitted()){
+        //     const liked = this.getMoviesOverLikeThreshold();
+
+        //     for( const movie of liked) {
+        //         this.topRecommendation = this.topRecommendation.concat(movie);
+        //         this.topRecommendation = this.topRecommendation.concat(await getSuggestions(movie.title));
+        //         //console.log('liked', movie, 'recommended', this.topRecommendation);
+        //     }
+        //     notifyProcessingDone(this.members, this.topRecommendation);
+        // }
+    }
+
+    private combinedRatings = new Map<Movie,number>();
+    setCombinedRatings() {
+        let moviesIndices = new Map<number,Movie>();
+
+        for (let [movie, ratings] of this.movieRatings) {
+            let movieIndex = movie.index;
+
+            let movieToUse = moviesIndices.has(movieIndex) ? moviesIndices.get(movieIndex) as Movie : movie;
+            moviesIndices.set(movieIndex,movieToUse);
+
+            if (!this.combinedRatings.has(movieToUse)) {
+                this.combinedRatings.set(movieToUse, 0);
             }
-            notifyProcessingDone(this.members, this.topRecommendation);
+
+            for (let rating of ratings) {
+                let existingRating = this.combinedRatings.get(movieToUse) || 0;
+                this.combinedRatings.set(movieToUse, existingRating + rating.rating);
+            }
         }
     }
 
-    getMoviesOverLikeThreshold(): Movie[]{
-        const moviesOverThreshold: Movie[] = []
+    private nearestNeighbours: Movie[] = [];
+    async setupRecommendations() {
+        this.setCombinedRatings();
 
-        for(const movie of this.movieRatings.keys()){
-            let positive:number = 0;
-            const ratings: MovieRating[] = this.movieRatings.get(movie)!!;
+        let perfectScoreMovies: Movie[] = [];
+        let secondHighestScoreMovies: Movie[] = [];
+        let thirdHighestScoreMovies: Movie[] = [];
 
-            for(const rating of ratings){
-                if(rating.rating == 1){ positive += 1;}
-            }
+        let perfectScore = this.members.length;
+        let secondHighestScore = Math.max(...Array.from(this.combinedRatings.values()).filter((score: number) => score < perfectScore));
+        let thirdHighestScore = Math.max(...Array.from(this.combinedRatings.values()).filter((score: number) => score < secondHighestScore));
 
-            const likePercentage = positive/ratings.length
-            if( likePercentage> this.likeThreshold){
-                movie.explanation = `${likePercentage*100}% of you liked this movie`
-
-                // Do not iterate over title strings, instead connect every like to the Movie object in the map
-                moviesOverThreshold.push(movie);
+        for (let [movie,rating] of this.combinedRatings) {
+            if (rating === this.members.length) {
+                movie.explanation = `100% of you liked this movie`
+                perfectScoreMovies.push(movie);
+            } else if (rating === secondHighestScore && secondHighestScore >= 0) {
+                secondHighestScoreMovies.push(movie);
+            } else if (rating === thirdHighestScore && thirdHighestScore > 0) {
+                thirdHighestScoreMovies.push(movie);
             }
         }
-        return moviesOverThreshold;
+
+        this.topRecommendation.push(...perfectScoreMovies);
+        let amntRandomMovies = this.numberOfRecommendations - this.topRecommendation.length;
+        let combinedMovies: Movie[] = [...perfectScoreMovies, ...secondHighestScoreMovies, ...thirdHighestScoreMovies];
+        
+        console.log(combinedMovies);
+
+        for(let movie of combinedMovies) {
+            this.nearestNeighbours.concat(await get3NN(movie.title));
+        }
+
+        //TODO set up the random movies list, perfect neighbours 3 occurences, 2nd neighbouts + 2nd movies 2 occurences, and 3rd neighbours + 3rd movies 1 occurence
+        //     then randomly take out amntRandomMovies to fill topRecommendation
+        //     this list gets send to LIME for full explanation and is returned
+
     }
+
+    // getMoviesOverLikeThreshold(): Movie[]{
+    //     const moviesOverThreshold: Movie[] = []
+
+    //     this.setCombinedRatings();
+
+    //     console.log(this.combinedRatings);
+
+    //     // for(const movie of this.movieRatings.keys()){
+    //     //     let positive:number = 0;
+    //     //     const ratings: MovieRating[] = this.movieRatings.get(movie)!!;
+
+    //     //     for(const rating of ratings){
+
+    //     //         if(rating.rating == 1){ positive += 1;}
+    //     //     }
+
+    //     //     const likePercentage = positive/ratings.length
+    //     //     if( likePercentage> this.likeThreshold){
+    //     //         movie.explanation = `${likePercentage*100}% of you liked this movie`
+
+    //     //         // Do not iterate over title strings, instead connect every like to the Movie object in the map
+    //     //         moviesOverThreshold.push(movie);
+    //     //     }
+    //     // }
+    //     return moviesOverThreshold;
+    // }
 
     getSuggestions(): Movie[]{
         return this.nextSuggestions;
