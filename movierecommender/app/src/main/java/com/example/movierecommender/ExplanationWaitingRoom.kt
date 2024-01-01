@@ -1,8 +1,6 @@
 package com.example.movierecommender
 
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Shader
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import com.example.movierecommender.databinding.ExplanationWaitingRoomBinding
@@ -12,15 +10,12 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.AbsoluteSizeSpan
-import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.util.Log
 import android.widget.TextView
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.SeekBar
 import com.squareup.picasso.Picasso
 import io.socket.client.Socket
 import org.json.JSONObject
@@ -29,6 +24,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import java.util.TreeSet
 import kotlin.math.abs
+
 
 class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureListener {
     private lateinit var binding: ExplanationWaitingRoomBinding
@@ -62,7 +58,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
             roomId = b.getString("roomcode")!!
             Log.d("ExplanationWaitingRoom", "Room ID: $roomId")
         }
-        mSocket.off("disbandgroup") // to avoid weird behaviour
+
         id = (application as UniqueID).uniqueId
 
         mSocket.on("processingDone") { args ->
@@ -98,19 +94,6 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
         })
     }
 
-    fun insertSpaceBetweenCapitalAndNonCapital(input: String): String {
-        val result = StringBuilder()
-
-        for (i in input.indices) {
-            if (i > 0 && input[i - 1].isLowerCase() && input[i].isUpperCase()) {
-                result.append(' ') // Insert space between capital and non-capital letters
-            }
-            result.append(input[i])
-        }
-
-        return result.toString()
-    }
-
     private fun displayRecommendation(recommendation: Movie) {
         Log.d("DisplayRecommendation", "$currentRecommendationIndex,${recommendationBuffer.size}")
         if (currentRecommendationIndex < recommendationBuffer.size) {
@@ -127,65 +110,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 println("CONTENT = $editable")
 
 
-                if (editable.startsWith("{")) {
 
-                    try {
-                        val jsonObject = JSONObject(editable.toString())
-                        val keysList = jsonObject.keys().asSequence().map { it.toString() }.toList()
-
-                        var factors = keysList.map { k ->
-                            k to Pair(jsonObject.optDouble(k, 0.0), abs(jsonObject.optDouble(k, 0.0)))
-                        }
-
-                        // normalize
-                        val maxFactor = factors.maxBy { it.second.second }?.second?.second ?: 1.0
-                        factors = keysList.map { k ->
-                            k to Pair(jsonObject.optDouble(k, 0.0), abs(jsonObject.optDouble(k, 0.0) / maxFactor) * 100)
-                        }
-
-                        Log.d("FACTORS", factors.toString());
-
-                        val linearLayoutSlider = findViewById<LinearLayout>(binding.expl.id)
-                        val linearLayoutText = findViewById<LinearLayout>(binding.explText.id);
-
-                        linearLayoutSlider.removeAllViews();
-                        linearLayoutText.removeAllViews();
-
-                        for ((k, v) in factors) {
-
-                            val textView = TextView(this)
-                            textView.text = insertSpaceBetweenCapitalAndNonCapital(k.toString());
-
-                            val seekBar = SeekBar(this)
-                            seekBar.max = 100 // Assuming a range from 0 to 1, you can adjust as needed
-
-                            seekBar.progress = v.second.toInt()
-                            seekBar.isEnabled = false
-
-                            linearLayoutText.addView(textView)
-                            linearLayoutSlider.addView(seekBar)
-
-                            binding.tvRecommendationFactors.visibility = View.VISIBLE
-                            binding.tvRecommendationImportance.visibility = View.VISIBLE
-                            binding.expl.visibility = View.VISIBLE
-                            binding.explText.visibility = View.VISIBLE
-                            binding.tvExplText.visibility = View.GONE
-
-                        }
-                    }
-                    catch (e: JSONException) {
-                        e.printStackTrace()
-                    }
-                }
-                else {
-                    binding.tvRecommendationFactors.visibility = View.GONE
-                    binding.tvRecommendationImportance.visibility = View.GONE
-                    binding.expl.visibility = View.GONE
-                    binding.explText.visibility = View.GONE
-                    binding.tvExplText.visibility = View.VISIBLE
-                    binding.tvExplText.text = editable
-                }
-/*
 
                 if (editable.startsWith("{")) {
                     try {
@@ -251,7 +176,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 } else {
                     binding.tvRecommendationExplained.text = editable
                 }
-*/
+
 //                if (editable.startsWith("{")) {
 //                    try {
 //                        val jsonObject = JSONObject(editable.toString())
@@ -298,11 +223,8 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 binding.ivRecommendedMovie.visibility = View.GONE
                 binding.tvRecommendedMovie.visibility = View.GONE
                 binding.tvRecommendationFactors.visibility = View.GONE
-                binding.tvRecommendationImportance.visibility = View.GONE
-                binding.tvExplText.visibility = View.GONE
-
                 binding.titleText.visibility = View.GONE
-                ///binding.tvRecommendationExplained.visibility = View.GONE
+                binding.tvRecommendationExplained.visibility = View.GONE
                 binding.swLeftBtn.visibility = View.GONE
                 binding.swRightBtn.visibility = View.GONE
             } else {
@@ -313,11 +235,8 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 binding.ivRecommendedMovie.visibility = View.VISIBLE
                 binding.tvRecommendedMovie.visibility = View.VISIBLE
                 binding.tvRecommendationFactors.visibility = View.VISIBLE
-                binding.tvRecommendationImportance.visibility = View.VISIBLE
                 binding.titleText.visibility = View.VISIBLE
-                binding.tvExplText.visibility = View.VISIBLE
-
-                /// binding.tvRecommendationExplained.visibility = View.VISIBLE
+                binding.tvRecommendationExplained.visibility = View.VISIBLE
                 // Update swipe button visibility
                 binding.swLeftBtn.visibility = View.GONE
                 binding.swRightBtn.visibility = View.VISIBLE

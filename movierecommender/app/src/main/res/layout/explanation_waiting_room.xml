@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
         android:ellipsize="marquee"
         android:focusable="true"
         android:focusableInTouchMode="true"
@@ -34,6 +35,7 @@
         android:text="Movie Title"
         android:textSize="20sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tvRecommendationFactors"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,10 +45,36 @@
         android:id="@+id/ivRecommendedMovie"
         android:layout_width="297dp"
         android:layout_height="389dp"
-        android:layout_marginTop="52dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvRecommendationFactors"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvRecommendationFactors"
+        android:layout_width="373dp"
+        android:layout_height="27dp"
+        android:layout_marginTop="20dp"
+        android:text="Recommendation factors:"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tvRecommendationExplained"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titleText" />
+
+    <TextView
+        android:id="@+id/tvRecommendationExplained"
+        android:layout_width="374dp"
+        android:layout_height="73dp"
+        android:text="Explanations for movie..."
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/exit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvRecommendationFactors" />
 
     <TextView
         android:id="@+id/tvLoadingRecommendations"
@@ -109,64 +137,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.99" />
-
-    <LinearLayout
-        android:id="@+id/expl"
-        android:layout_width="193dp"
-        android:layout_height="135dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="20dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/exit"
-        app:layout_constraintEnd_toEndOf="parent"></LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/expl_text"
-        android:layout_width="183dp"
-        android:layout_height="135dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginBottom="20dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/exit"
-        app:layout_constraintStart_toStartOf="parent"></LinearLayout>
-
-    <TextView
-        android:id="@+id/tvRecommendationFactors"
-        android:layout_width="183dp"
-        android:layout_height="42dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginBottom="16dp"
-        android:text="Recommendation factors:"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/expl_text"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/tvRecommendationImportance"
-        android:layout_width="183dp"
-        android:layout_height="31dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="20dp"
-        android:text="Importance (%)"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/expl"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <TextView
-        android:id="@+id/tvExplText"
-        android:layout_width="273dp"
-        android:layout_height="42dp"
-        android:layout_marginStart="64dp"
-        android:layout_marginBottom="112dp"
-        android:text="TextView"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/exit"
-        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
