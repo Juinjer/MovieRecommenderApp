@@ -77,6 +77,58 @@ export async function get3NN(movieTitle: string): Promise<Movie[]> {
     }   
 }
 
+export async function getNeighbourExplanation(parent: Movie, child: Movie): Promise<Movie[]> {
+    console.log(JSON.stringify({ "parent": parent, "child": child }));
+    try {
+        const response = await fetch(`http://${endpoint}:8000/neighbour_explanation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "parent": {
+                    "index": parent.index,
+                    "title": parent.title,
+                    "overview": parent.overview,
+                    "full_poster_path": parent.full_poster_path,
+                    "explanation": ""
+                },  
+                "child": {
+                    "index": child.index, 
+                    "title": child.title,
+                    "overview": child.overview,
+                    "full_poster_path": child.full_poster_path,
+                    "explanation": ""
+                }
+
+             }),
+        });
+
+        if (!response.ok) {
+          console.error(`Request failed with status ${response.status}`);
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const responseJSON = await response.json();
+        const suggestions: Movie[] = responseJSON.recommendations.map((movie: any) => {
+            // Map each movie to a Movie object
+            return {
+                index: movie.index,
+                title: movie.title,
+                overview: movie.overview,
+                full_poster_path: movie.full_poster_path,
+                explanation: movie.explanation
+            };
+        });
+
+        return suggestions;
+    } catch (error) {
+        console.log("test");
+        console.error(error);
+        return [];
+    }
+}
+
 
 /**
  * Retrieves a number of random movie suggestions.
