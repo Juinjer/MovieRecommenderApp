@@ -1,4 +1,4 @@
-package com.example.movierecommender
+package com.example.cineinsight
 
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -7,7 +7,7 @@ import android.util.Log
 import android.widget.SeekBar
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.Toolbar
-import com.example.movierecommender.databinding.SettingsScreenBinding
+import com.example.cineinsight.databinding.SettingsScreenBinding
 import io.socket.client.Socket
 import java.lang.Integer.parseInt
 

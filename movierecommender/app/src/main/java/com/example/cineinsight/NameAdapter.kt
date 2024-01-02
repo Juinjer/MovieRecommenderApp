@@ -1,4 +1,4 @@
-package com.example.movierecommender
+package com.example.cineinsight
 
 import android.view.LayoutInflater
 import android.view.View

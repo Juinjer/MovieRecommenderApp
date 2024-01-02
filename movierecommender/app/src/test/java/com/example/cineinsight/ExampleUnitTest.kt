@@ -1,4 +1,4 @@
-package com.example.movierecommender
+package com.example.cineinsight
 
 import org.junit.Test
 

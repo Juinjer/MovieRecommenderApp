@@ -1,4 +1,4 @@
-package com.example.movierecommender
+package com.example.cineinsight
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,7 +9,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.movierecommender.databinding.SwipeScreenBinding
+import com.example.cineinsight.databinding.SwipeScreenBinding
 import com.squareup.picasso.Picasso
 import io.socket.client.Socket
 import org.json.JSONArray

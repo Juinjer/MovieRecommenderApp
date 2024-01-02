@@ -1,4 +1,4 @@
-package com.example.movierecommender
+package com.example.cineinsight
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -8,12 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
-import com.example.movierecommender.databinding.ActivityJoinRoomBinding
+import com.example.cineinsight.databinding.ActivityJoinRoomBinding
 
 class JoinRoom : AppCompatActivity() {
     private lateinit var binding: ActivityJoinRoomBinding

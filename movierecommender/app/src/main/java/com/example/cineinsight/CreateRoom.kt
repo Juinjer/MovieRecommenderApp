@@ -1,65 +1,76 @@
-package com.example.movierecommender
+package com.example.cineinsight
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
+import android.util.Log
 import android.view.View
-import android.widget.Toast
+import com.example.cineinsight.databinding.ActivityCreateRoomBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.movierecommender.databinding.WaitingRoomBinding
 import kotlin.random.Random
 
-class WaitingRoom : AppCompatActivity() {
-    private lateinit var binding: WaitingRoomBinding
+class CreateRoom : AppCompatActivity() {
+
+    private lateinit var binding: ActivityCreateRoomBinding
+//    private lateinit var qrgEncoder: QRGEncoder
+//    private lateinit var bitmap: Bitmap
     private lateinit var recyclerView: RecyclerView
     private lateinit var nameList: ArrayList<Name>
     private lateinit var nameAdapter: NameAdapter
 
-    @SuppressLint("ClickableViewAccessibility") //TODO look for a better way
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val mSocket = SocketHandler.getSocket()
+        binding = ActivityCreateRoomBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val handler = Handler(Looper.getMainLooper())
 
-        binding = WaitingRoomBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        val mSocket = SocketHandler.getSocket()!!
+
         val b = intent.extras
+        Log.d("rid", b.toString())
         if (b != null) {
-            val s = b.getString("roomcode")
+            val s = b.getString("rId")
             val editable: Editable = Editable.Factory.getInstance().newEditable(s)
-            binding.roomId.text = editable
+            binding.roomidnumber.text = editable
         }
-        mSocket?.on("hostStart") { _ ->
-            val b = Bundle()
-            b.putString("roomcode", binding.roomId.text.toString())
-            val intent = Intent(this, SwipeScreen::class.java)
-            intent.putExtras(b)
-            startActivity(intent)
-        }
-        mSocket?.on("disbandgroup") { _ ->
-            handler.post {
-                Toast.makeText(
-                    applicationContext, "Group host disbanded the group",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            val intent = Intent(this, JoinRoom::class.java)
-            mSocket.disconnect()
-            startActivity(intent)
-        }
+        mSocket.off("disbandgroup") // to avoid weird behaviour
+
+        val roomId = binding.roomidnumber.text.toString()
+        val id = (application as UniqueID).uniqueId
+        val data = listOf(roomId, id)
+        b?.putString("roomcode", roomId)
+
         binding.cancel.setOnClickListener(View.OnClickListener() {
-            val id = (application as UniqueID).uniqueId
-            val roomID = binding.roomId.text.toString()
-            val data = listOf(roomID, id)
-            mSocket?.emit("leaveRoom", data.joinToString(","))
             val intent = Intent(this, MainActivity::class.java)
+            mSocket.emit("leaveRoom", data.joinToString(","))
             startActivity(intent)
+        })
+        binding.start.setOnClickListener(View.OnClickListener {
+            val intent = Intent(this, SwipeScreen::class.java)
+            intent.putExtra("roomcode", roomId)
+            startActivity(intent)
+            mSocket.emit("startLobby", data.joinToString(","))
+        })
+        binding.settings.setOnClickListener(View.OnClickListener {
+            val intent = Intent(this, SettingsScreen::class.java)
+            intent.putExtra("roomcode", roomId)
+            startActivity(intent)
+        })
+        binding.copyBtn.setOnClickListener(View.OnClickListener {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val id = binding.roomidnumber.text.toString()
+            val clip = ClipData.newPlainText("test", id)
+            clipboard.setPrimaryClip(clip)
         })
 
         //TODO: should make some class to handle this member logic
@@ -77,12 +88,14 @@ class WaitingRoom : AppCompatActivity() {
             R.drawable.penguin,
             R.drawable.raccoon
         )
-        mSocket?.on("joinNotif") { args ->
-            nameList.add(Name(imageResources[Random.nextInt(imageResources.size-1)], args[0].toString()))
+        mSocket.off("disbandgroup") // to avoid weird behaviour
+
+        mSocket.on("joinNotif") { args ->
+            nameList.add(Name(imageResources[Random.nextInt(imageResources.size)], args[0].toString()))
             handler.post { updateList() }
         }
 
-        mSocket?.on("leaveNotif") { args ->
+        mSocket.on("leaveNotif") { args ->
             for (i in 0..<nameList.size) {
                 if (nameList[i].name == args[0].toString()){
                     nameList.removeAt(i)
@@ -90,12 +103,13 @@ class WaitingRoom : AppCompatActivity() {
             }
             handler.post { updateList() }
         }
-
         recyclerView = binding.recyclerView
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(this)
         nameList = ArrayList()
+
         if (b != null) {
+            Log.d("test", b.getString("members")!!)
             val s = b.getString("members")!!
             val splitted = s.split(",")
             imageResources.shuffle()
@@ -110,4 +124,5 @@ class WaitingRoom : AppCompatActivity() {
         this.nameAdapter = NameAdapter(this.nameList)
         recyclerView.adapter = this.nameAdapter
     }
+
 }

@@ -1,4 +1,4 @@
-package com.example.movierecommender;
+package com.example.cineinsight;
 
 import android.app.Activity
 import android.content.Context
@@ -6,7 +6,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.view.View;
 import android.view.inputmethod.InputMethodManager
-import kotlin.random.Random
 
 object UtilsM {
     private var names = listOf(

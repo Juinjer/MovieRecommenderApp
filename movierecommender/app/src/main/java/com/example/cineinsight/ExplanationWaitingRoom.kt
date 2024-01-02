@@ -1,9 +1,9 @@
-package com.example.movierecommender
+package com.example.cineinsight
 
 import android.content.Intent
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
-import com.example.movierecommender.databinding.ExplanationWaitingRoomBinding
+import com.example.cineinsight.databinding.ExplanationWaitingRoomBinding
 import android.os.Bundle
 import android.text.Editable
 import android.text.Spannable

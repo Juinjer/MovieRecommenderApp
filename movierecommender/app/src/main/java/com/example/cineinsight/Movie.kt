@@ -1,4 +1,4 @@
-package com.example.movierecommender
+package com.example.cineinsight
 
 data class Movie(
     val index: Int,

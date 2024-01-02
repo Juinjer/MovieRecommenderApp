@@ -1,4 +1,4 @@
-package com.example.movierecommender.ui.theme
+package com.example.cineinsight.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

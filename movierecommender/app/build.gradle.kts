@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.movierecommender"
+    namespace = "com.example.cineinsight"
     compileSdk = 34
 
     buildFeatures {
@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.movierecommender"
+        applicationId = "com.example.cineinsight"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

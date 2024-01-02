@@ -1,4 +1,4 @@
-package com.example.movierecommender
+package com.example.cineinsight
 
 import io.socket.client.IO
 import io.socket.client.Socket

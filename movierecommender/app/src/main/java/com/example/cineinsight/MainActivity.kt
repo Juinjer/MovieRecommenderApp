@@ -1,4 +1,4 @@
-package com.example.movierecommender
+package com.example.cineinsight
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -8,7 +8,7 @@ import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
-import com.example.movierecommender.databinding.ActivityMainBinding
+import com.example.cineinsight.databinding.ActivityMainBinding
 
 import java.util.UUID
 
