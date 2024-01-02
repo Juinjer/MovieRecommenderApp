@@ -174,9 +174,11 @@ export class Room {
 
         for (let movie of randomMovies) {
             if (movie !== undefined) {
-                await getNeighbourExplanation(movie.parent, movie.child);
+                let explanation = await getNeighbourExplanation(movie.parent, movie.child);
+                console.log("explanation");
+                console.log(explanation);
+                console.log("\n")
                 // recommendations.concat(await getNeighbourExplanation(movie))
-
             }
         }
 

@@ -1,6 +1,6 @@
 import random
-import lime
 import pandas as pd
+import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.neighbors import NearestNeighbors
 from lime.lime_text import LimeTextExplainer
@@ -33,45 +33,41 @@ def get_similar_movies(movie_title, k=3):
     # similar_movies = df.iloc[indices.flatten()]
     return similar_movies
 
-def get_neighbour_explanation(parent, child):
+def get_neighbour_explanation(parent,child):
     parent_soup = df.loc[parent.index, 'soup']
     child_soup = df.loc[child.index, 'soup']
-    print(parent_soup)
-    # explainer = LimeTextExplainer(class_names=['Similar', 'Not Similar'])
-    # explanations = []
-    # explanation = explainer.explain_instance(child.overview, lambda text: predict_similarity(parent.overview, text), num_features=10)
-    # exp_str = "{" + ", ".join(f'"{word}": {weight}' for word, weight in explanation.as_list()) + "}"
-    # explanations.append(exp_str)
-    # return explanations
     
-# def predict_similarity(parent_text,child_text):
-    # parent_vector = tfidf.transform([parent_text])
-    # child_vector = tfidf.transform([child_text])
-    # distances, indies = model.kneighbors(parent_vector, n_neighbors=2)
-    # similarity_score = distances[0, 1]
-    # return similarity_score
+    parent_vector = tfidf.transform([parent_soup])
+    child_vector = tfidf.transform([child_soup])
+    
+    parent_words = {word: val for word, val in zip(tfidf.get_feature_names_out(), parent_vector.toarray()[0]) if val > 0}
+    child_words = {word: val for word, val in zip(tfidf.get_feature_names_out(), child_vector.toarray()[0]) if val > 0}
+    
+    common_words = set(parent_words.keys()) & set(child_words.keys())
+    explanation = {word: (parent_words[word], child_words[word]) for word in common_words}
+    
+    sorted_words = sorted(explanation.items(), key=lambda x: (x[1][0] + x[1][1]) / 2, reverse=True)
+    
+    top_10_words = {word: sum(values) for word, values in sorted_words[:10]}
 
-# def get_explanation(similar_movies):
-#     print("explaination")
-#     explainer = lime.lime_text.LimeTextExplainer(class_names=['Similar', 'Not Similar'])
+    return top_10_words
 
-#     explanations = []  # List to store explanations
+# def predict_similarity(texts):
+#     text_vectors = tfidf.transform(texts)
+#     distances, indies = model.kneighbors(text_vectors, n_neighbors=3)
+#     return distances[:, 1:]
 
-#     for i in range(len(similar_movies)):
-#         print(f'Similar movie #{i + 1}: {similar_movies["title"].iloc[i]}')
-#         movie_overview = similar_movies['soup'].iloc[i]
-#         explanation = explainer.explain_instance(
-#             movie_overview, predict_similarity, num_features=10)
-#         # explanation.show_in_notebook()
+# def get_neighbour_explanation(parent, child):
+#     parent_soup = df.loc[parent.index, 'soup']
+#     child_soup = df.loc[child.index, 'soup']
 
-#         # Format the explanation details as a string
-#         exp_str = "{" + ", ".join(f'"{word}": {weight}' for word, weight in explanation.as_list()) + "}"
+#     def predict_child_similarity(texts):
+#         predictions = predict_similarity([parent_soup] + texts)
+#         return np.array([predictions[0] for _ in texts])
 
-#         explanations.append(exp_str)
+#     explainer = LimeTextExplainer(class_names=['Similar', 'Not Similar'])
+#     explanation = explainer.explain_instance(child_soup, predict_child_similarity, num_features=10)
 
-#     return explanations
+#     exp_str = "{" + ", ".join(f'"{word}": {weight}' for word, weight in explanation.as_list()) + "}"
 
-# # def predict_similarity(texts):
-# #     text_vectors = tfidf.transform(texts)
-# #     distances, indies = model.kneighbors(text_vectors, n_neighbors=3)
-# #     return distances[:, 1:]
+#     return {"explanation": exp_str}

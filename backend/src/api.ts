@@ -77,7 +77,7 @@ export async function get3NN(movieTitle: string): Promise<Movie[]> {
     }   
 }
 
-export async function getNeighbourExplanation(parent: Movie, child: Movie): Promise<Movie[]> {
+export async function getNeighbourExplanation(parent: Movie, child: Movie): Promise<Movie> {
     console.log(JSON.stringify({ "parent": parent, "child": child }));
     try {
         const response = await fetch(`http://${endpoint}:8000/neighbour_explanation`, {
@@ -110,22 +110,26 @@ export async function getNeighbourExplanation(parent: Movie, child: Movie): Prom
         }
 
         const responseJSON = await response.json();
-        const suggestions: Movie[] = responseJSON.recommendations.map((movie: any) => {
-            // Map each movie to a Movie object
-            return {
-                index: movie.index,
-                title: movie.title,
-                overview: movie.overview,
-                full_poster_path: movie.full_poster_path,
-                explanation: movie.explanation
-            };
-        });
+        console.log("response");
+        console.log(responseJSON);
+        console.log("\n");
+        return {"index": 0, "title": "", "overview": "", "full_poster_path": "", "explanation": ""};
 
-        return suggestions;
+        // const suggestions: Movie[] = responseJSON.recommendations.map((movie: any) => {
+        //     // Map each movie to a Movie object
+        //     return {
+        //         index: movie.index,
+        //         title: movie.title,
+        //         overview: movie.overview,
+        //         full_poster_path: movie.full_poster_path,
+        //         explanation: movie.explanation
+        //     };
+        // });
+        // return suggestions;
     } catch (error) {
         console.log("test");
         console.error(error);
-        return [];
+        return {"index": 0, "title": "", "overview": "", "full_poster_path": "", "explanation": ""};
     }
 }
 
