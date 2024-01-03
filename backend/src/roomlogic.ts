@@ -88,21 +88,15 @@ export class Room {
     // set up the combined ratings map for each unique movie
     setCombinedRatings() {
         let moviesIndices = new Map<number,Movie>();
-
         for (let [movie, ratings] of this.movieRatings) {
             let movieIndex = movie.index;
-
             let movieToUse = moviesIndices.has(movieIndex) ? moviesIndices.get(movieIndex) as Movie : movie;
             moviesIndices.set(movieIndex,movieToUse);
-
-            if (!this.combinedRatings.has(movieToUse)) {
-                this.combinedRatings.set(movieToUse, 0);
-            }
-
+            let existingRating = this.combinedRatings.get(movieToUse) || 0;
             for (let rating of ratings) {
-                let existingRating = this.combinedRatings.get(movieToUse) || 0;
-                this.combinedRatings.set(movieToUse, existingRating + rating.rating);
+                existingRating += rating.rating;
             }
+            this.combinedRatings.set(movieToUse, existingRating);
         }
     }
 
@@ -114,11 +108,12 @@ export class Room {
         this.setCombinedRatings();
 
         let perfectScore = this.members.length;
-        let secondHighestScore = Math.max(...Array.from(this.combinedRatings.values()).filter((score: number) => score < perfectScore));
-        let thirdHighestScore = Math.max(...Array.from(this.combinedRatings.values()).filter((score: number) => score < secondHighestScore));
+        let scores = Array.from(this.combinedRatings.values()).sort((a, b) => b - a);
+        let secondHighestScore = scores[1];
+        let thirdHighestScore = scores[2];
 
         for (let [movie,rating] of this.combinedRatings) {
-            if (rating === this.members.length) {
+            if (rating === perfectScore) {
                 movie.explanation = `100% of you liked this movie`
                 this.perfectScoreMovies.push(movie);
             } else if (rating === secondHighestScore && secondHighestScore >= 0) {

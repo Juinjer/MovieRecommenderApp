@@ -11,6 +11,7 @@ df = pd.read_csv("new_knn.csv")
 
 tfidf = TfidfVectorizer(stop_words="english")
 tfidf_matrix = tfidf.fit_transform(df['soup'])
+cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
 # print(tfidf_matrix.shape)
 
 # model = NearestNeighbors(metric='cosine')
@@ -26,7 +27,6 @@ def get_random_movies(number_of_movies, top=100):
 
 def get_similar_movies(movie_title, k=3):
     movie_index = df[df['title'] == movie_title].index[0]
-    cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
     sim_scores = list(enumerate(cosine_sim[movie_index]))
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     sim_scores = sim_scores[1:k+1]
