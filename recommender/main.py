@@ -18,7 +18,6 @@ async def read_root():
 @app.get("/random/{number_of_movies}")
 async def get_random_movies(number_of_movies: int):
     random_movies = model.get_random_movies(number_of_movies)
-
     suggestions = [
         {
             "index": index,
