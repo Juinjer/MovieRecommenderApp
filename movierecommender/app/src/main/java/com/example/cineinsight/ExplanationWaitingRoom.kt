@@ -20,8 +20,11 @@ import com.squareup.picasso.Picasso
 import io.socket.client.Socket
 import org.json.JSONObject
 import android.widget.Toast
+import androidx.compose.ui.text.toLowerCase
 import org.json.JSONArray
 import org.json.JSONException
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.TreeSet
 import kotlin.math.abs
 
@@ -101,37 +104,23 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 val title = recommendation.title
                 val fullPosterPath = recommendation.fullPosterPath
                 val recommendationFactors = recommendation.explanation
-
-                // Update UI components
                 Picasso.get().load(fullPosterPath).into(binding.ivRecommendedMovie)
                 var editable: Editable = Editable.Factory.getInstance().newEditable(title)
                 binding.titleText.text = editable
                 editable = Editable.Factory.getInstance().newEditable(recommendationFactors)
                 println("CONTENT = $editable")
-
                 if (editable.startsWith("{")) {
                     try {
                         val jsonObject = JSONObject(editable.toString())
                         val keysList = jsonObject.keys().asSequence().map { it.toString() }.toList()
                         val importanceToFontSize = mapOf(
-                            0.6 to 26f,
-                            0.55 to 24f,
-                            0.50 to 22f,
-                            0.46 to 20f,
-                            0.42 to 18f,
-                            0.38 to 16f,
-                            0.30 to 14f
+                            0.50 to 20f,
+                            0.45 to 18f,
+                            0.40 to 16f,
+                            0.30 to 14f,
+                            0.20 to 12f,
+                            0.10 to 10f
                         )
-
-                        fun capitalizeFirstLetter(str: String): String {
-                            return if (str.isNotEmpty()) {
-                                str.substring(0, 1).toUpperCase() + str.substring(1)
-                            } else {
-                                str
-                            }
-                        }
-
-                        val capitalizedKeysList = keysList.map { capitalizeFirstLetter(it) }
                         val caseInsensitiveComparator = Comparator<String> { str1, str2 ->
                             str1.compareTo(
                                 str2,
@@ -139,14 +128,39 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                             )
                         }
                         val sortedKeys = TreeSet(caseInsensitiveComparator)
-                        sortedKeys.addAll(capitalizedKeysList)
+                        sortedKeys.addAll(keysList)
                         val spannableStringBuilder = SpannableStringBuilder()
                         for (key in sortedKeys) {
-                            val importance = jsonObject.optDouble(key, 0.0)
-                            val fontSize = importanceToFontSize[importance] ?: 20f
-//                            TODO BOLD
-                            val isBold = importance > 0.50
-                            val spannableString = SpannableString("$key, ")
+                            val lowerKey = key.toLowerCase()
+                            val importance = jsonObject.optDouble(lowerKey, 0.00)
+                            val isBold = importance >= 0.45
+
+                            println("Importance value for key '$key': $importance") // Add this line
+
+
+                            //TODO deze lijkt random?
+                            fun findFontSize(
+                                importance: Double,
+                                mapping: Map<Double, Float>
+                            ): Float {
+                                val tolerance = 0.01
+                                for ((key, value) in mapping) {
+                                    if (importance in (key - tolerance)..(key + tolerance)) {
+                                        return value
+                                    }
+                                }
+                                return mapping.values.firstOrNull() ?: 10f
+                            }
+                            val roundedImportance = BigDecimal(importance).setScale(2, RoundingMode.HALF_EVEN).toDouble()
+                            val fontSize = findFontSize(roundedImportance, importanceToFontSize)
+                            println("FontSize for '$key': $fontSize")
+
+
+
+                            //TODO werkt op vreemde wijze niet...
+//                            val fontSize = importanceToFontSize[importance] ?: 20f
+
+                            val spannableString = SpannableString("$lowerKey, ")
                             spannableString.setSpan(
                                 AbsoluteSizeSpan(fontSize.toInt(), true),
                                 0,
@@ -163,10 +177,12 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                             }
                             spannableStringBuilder.append(spannableString)
                         }
-                        spannableStringBuilder.delete(
-                            spannableStringBuilder.length - 2,
-                            spannableStringBuilder.length
-                        )
+                        if (spannableStringBuilder.length >= 2) {
+                            spannableStringBuilder.delete(
+                                spannableStringBuilder.length - 2,
+                                spannableStringBuilder.length
+                            )
+                        }
                         binding.tvRecommendationExplained.text = spannableStringBuilder
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -174,37 +190,6 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 } else {
                     binding.tvRecommendationExplained.text = editable
                 }
-
-//                if (editable.startsWith("{")) {
-//                    try {
-//                        val jsonObject = JSONObject(editable.toString())
-//                        val keysList = jsonObject.keys().asSequence().map { it.toString() }.toList()
-//                        fun capitalizeFirstLetter(str: String): String {
-//                            return if (str.isNotEmpty()) {
-//                                str.substring(0, 1).toUpperCase() + str.substring(1)
-//                            } else {
-//                                str
-//                            }
-//                        }
-//
-//                        val capitalizedKeysList = keysList.map { capitalizeFirstLetter(it) }
-//                        val caseInsensitiveComparator = Comparator<String> { str1, str2 ->
-//                            str1.compareTo(
-//                                str2,
-//                                ignoreCase = true
-//                            )
-//                        }
-//                        val sortedKeys = TreeSet(caseInsensitiveComparator)
-//                        sortedKeys.addAll(capitalizedKeysList)
-//                        val keysString = sortedKeys.joinToString(", ")
-//                        binding.tvRecommendationExplained.text = keysString
-//                        println(keysString)
-//                    } catch (e: JSONException) {
-//                        e.printStackTrace()
-//                    }
-//                } else {
-//                    binding.tvRecommendationExplained.text = editable
-//                }
                 val recommendationTitle = "Recommendation #" + (currentRecommendationIndex + 1)
                 binding.tvRecommendedMovie.text = recommendationTitle
             }
