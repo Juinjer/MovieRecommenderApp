@@ -11,7 +11,7 @@ df = pd.read_csv("new_knn.csv")
 
 tfidf = TfidfVectorizer(stop_words="english")
 tfidf_matrix = tfidf.fit_transform(df['soup'])
-print(tfidf_matrix.shape)
+# print(tfidf_matrix.shape)
 
 # model = NearestNeighbors(metric='cosine')
 # model.fit(tfidf_matrix)

@@ -33,7 +33,7 @@ async def get_random_movies(number_of_movies: int):
 @app.post("/3nn")
 async def get_3nn(movie: MovieTitle):
     similar_movies = model.get_similar_movies(movie.title,3)
-    print(similar_movies);
+    # print(similar_movies);
     recommendations = [
         {
             "index": index,

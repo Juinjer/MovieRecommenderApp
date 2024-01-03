@@ -27,7 +27,7 @@ export async function getSuggestionsRandom(numberOfSuggestions: number): Promise
 
         return suggestions;
     } catch (error) {
-        console.log("test");
+        console.log("getRandomSuggestion error:\n");
         console.error(error);
         return [];
     }
@@ -67,7 +67,7 @@ export async function get3NN(movieTitle: string): Promise<Movie[]> {
 
         return suggestions;
     } catch (error) {
-        console.log("test");
+        console.log("get3NN error:\n");
         console.error(error);
         return [];
     }   
@@ -80,7 +80,7 @@ export async function get3NN(movieTitle: string): Promise<Movie[]> {
  * @throws If there is an error during the fetch operation or if the response does not match the expected structure.
  */
 export async function getNeighbourExplanation(parent: Movie, child: Movie): Promise<Movie> {
-    console.log(JSON.stringify({ "parent": parent, "child": child }));
+    // console.log(JSON.stringify({ "parent": parent, "child": child }));
     try {
         const response = await fetch(`http://${endpoint}:8000/neighbour_explanation`, {
             method: 'POST',
@@ -121,7 +121,7 @@ export async function getNeighbourExplanation(parent: Movie, child: Movie): Prom
             explanation: responseJSON.recommendation.explanation
         };
     } catch (error) {
-        console.log("test");
+        console.log("getNeighbourExplanation error:\n");
         console.error(error);
         return {"index": 0, "title": "", "overview": "", "full_poster_path": "", "explanation": ""};
     }
