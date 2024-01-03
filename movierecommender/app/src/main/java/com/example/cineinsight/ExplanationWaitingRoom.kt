@@ -109,21 +109,18 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 editable = Editable.Factory.getInstance().newEditable(recommendationFactors)
                 println("CONTENT = $editable")
 
-
-
-
                 if (editable.startsWith("{")) {
                     try {
                         val jsonObject = JSONObject(editable.toString())
                         val keysList = jsonObject.keys().asSequence().map { it.toString() }.toList()
                         val importanceToFontSize = mapOf(
-                            -0.04 to 26f,
-                            -0.03 to 24f,
-                            -0.02 to 22f,
-                            -0.01 to 20f,
-                            0.0 to 18f,
-                            0.01 to 16f,
-                            0.02 to 14f
+                            0.6 to 26f,
+                            0.55 to 24f,
+                            0.50 to 22f,
+                            0.46 to 20f,
+                            0.42 to 18f,
+                            0.38 to 16f,
+                            0.30 to 14f
                         )
 
                         fun capitalizeFirstLetter(str: String): String {
@@ -147,7 +144,8 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                         for (key in sortedKeys) {
                             val importance = jsonObject.optDouble(key, 0.0)
                             val fontSize = importanceToFontSize[importance] ?: 20f
-                            val isBold = importance <= -0.0125
+//                            TODO BOLD
+                            val isBold = importance > 0.50
                             val spannableString = SpannableString("$key, ")
                             spannableString.setSpan(
                                 AbsoluteSizeSpan(fontSize.toInt(), true),
