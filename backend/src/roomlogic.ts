@@ -172,6 +172,8 @@ export class Room {
         for (let movie of randomMovies) {
             if (movie !== undefined) {
                 let childExplanation = await getNeighbourExplanation(movie.parent, movie.child);
+                console.log("roomlogic");
+                console.log(childExplanation);
                 this.topRecommendation.push(childExplanation);
             }
         }

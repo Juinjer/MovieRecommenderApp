@@ -5,6 +5,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.neighbors import NearestNeighbors
 from lime.lime_text import LimeTextExplainer
 from sklearn.metrics.pairwise import linear_kernel
+import re
 
 pd.set_option('display.max_colwidth', None)
 df = pd.read_csv("new_knn.csv")
@@ -44,7 +45,24 @@ def get_neighbour_explanation(parent,child):
     explanation = {word: (parent_words[word], child_words[word]) for word in common_words}
     sorted_words = sorted(explanation.items(), key=lambda x: (x[1][0] + x[1][1]) / 2, reverse=True)
     top_10_words = {word: sum(values) for word, values in sorted_words[:10]}
-    return top_10_words
+    processed = process_top(top_10_words, child_soup)
+    return processed
+
+def process_top(top, soup):
+    actors = soup.split()[-6:]
+    actors_lower = [name.lower() for name in actors]
+    split_actors = [re.sub(r'([a-z])([A-Z])', r'\1 \2', name) for name in actors]
+
+    proccessed = {}
+
+    for key,val in top.items():
+        if key in actors_lower:
+            index = actors_lower.index(key)
+            proccessed[split_actors[index]] = val
+        else:
+            # proccessed[key.capitalize()] = val
+            proccessed[key.title()] = val
+    return proccessed
 
 # def get_similar_movies(movie_title, k=3):
 #     print("similar movies")
