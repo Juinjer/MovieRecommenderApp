@@ -1,7 +1,7 @@
 package com.example.movierecommender
 
 data class Movie(
-    val index: Int,
+    val id: Int,
     val title: String,
     val overview: String,
     val fullPosterPath: String,

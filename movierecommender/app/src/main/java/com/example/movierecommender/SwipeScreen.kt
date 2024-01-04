@@ -70,11 +70,11 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
 
             for (i in 0 until jsonArray.length()) {
                 val jsonObject = JSONObject(jsonArray.getString(i))
-                val index = jsonObject.getString("index").toInt()
+                val id = jsonObject.getString("id").toInt()
                 val fullPosterPath = jsonObject.getString("full_poster_path")
                 val title = jsonObject.getString("title")
                 val overview = jsonObject.getString("overview")
-                movieBuffer.add(Movie(index, title, overview, fullPosterPath))
+                movieBuffer.add(Movie(id, title, overview, fullPosterPath))
             }
             displayNextMovie()
         }
@@ -142,7 +142,7 @@ class SwipeScreen : AppCompatActivity(), GestureDetector.OnGestureListener {
     // Function to convert Movie object to JSON string
     private fun convertMovieToJsonString(movie: Movie): String {
         val json = JSONObject().apply {
-            put("index", movie.index)
+            put("id", movie.id)
             put("title", movie.title)
             put("overview", movie.overview)
             put("full_poster_path", movie.fullPosterPath)

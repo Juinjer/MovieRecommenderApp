@@ -71,12 +71,12 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
 
             for (i in 0 until jsonArray.length()) {
                 val jsonObject = JSONObject(jsonArray.getString(i))
-                val index = jsonObject.getString("index").toInt()
+                val id = jsonObject.getString("id").toInt()
                 val title = jsonObject.getString("title")
                 val overview = jsonObject.getString("overview")
                 val fullPosterPath = jsonObject.getString("full_poster_path")
                 val explanation = jsonObject.getString("explanation")
-                recommendationBuffer.add(Movie(index, title, overview, fullPosterPath, explanation))
+                recommendationBuffer.add(Movie(id, title, overview, fullPosterPath, explanation))
             }
             updateLoadingState(false)
             displayRecommendation(recommendationBuffer[0])
