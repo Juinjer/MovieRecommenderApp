@@ -65,7 +65,7 @@ export async function get3NN(movieId: number): Promise<number[]> {
 //                 overview: movie.overview,
 //                 full_poster_path: movie.full_poster_path
 //             };
-        });
+//        });
 
         return recommendations;
     } catch (error) {

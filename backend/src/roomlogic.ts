@@ -147,11 +147,11 @@ export class Room {
         for (let moviesObj of moviesObject) {
             for (let movie of moviesObj.movies) {
                 let nn_ids = await get3NN(movie.id);
-                for (let n_id of nn) {
+                for (let n_id of nn_ids) {
                     for (let i=0; i<moviesObj.copies; i++) {
                         let movieWithParent = {
                             parent: movie,
-                            childIndex: n_id
+                            childId: n_id
                         }
                         this.nearestNeighbours.push(movieWithParent);
                     }
