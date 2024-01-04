@@ -44,6 +44,9 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
     private var currentRecommendationIndex = 0
     var scrollingText: TextView? = null
 
+    var currentMovie: Movie? = null
+    var infoMode = false;
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ExplanationWaitingRoomBinding.inflate(layoutInflater)
@@ -95,92 +98,113 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         })
+        binding.info.setOnClickListener(View.OnClickListener {
+            infoMode = !infoMode;
+            displayRecommendation(currentMovie!!);
+        })
     }
 
     private fun displayRecommendation(recommendation: Movie) {
-        Log.d("DisplayRecommendation", "$currentRecommendationIndex,${recommendationBuffer.size}")
-        if (currentRecommendationIndex < recommendationBuffer.size) {
-            runOnUiThread {
-                val title = recommendation.title
-                val fullPosterPath = recommendation.fullPosterPath
-                val recommendationFactors = recommendation.explanation
-                Picasso.get().load(fullPosterPath).into(binding.ivRecommendedMovie)
-                var editable: Editable = Editable.Factory.getInstance().newEditable(title)
-                binding.titleText.text = editable
-                editable = Editable.Factory.getInstance().newEditable(recommendationFactors)
-                println("CONTENT = $editable")
-                if (editable.startsWith("{")) {
-                    try {
-                        val jsonObject = JSONObject(editable.toString())
-                        val keysList = jsonObject.keys().asSequence().map { it.toString() }.toList()
-                        val caseInsensitiveComparator = Comparator<String> { str1, str2 ->
-                            str1.compareTo(
-                                str2,
-                                ignoreCase = true
-                            )
-                        }
-                        val sortedKeys = TreeSet(caseInsensitiveComparator)
-                        sortedKeys.addAll(keysList)
-                        val spannableStringBuilder = SpannableStringBuilder()
-                        for (key in sortedKeys) {
-                            val lowerKey = key.toLowerCase()
-                            val importance = jsonObject.optDouble(lowerKey, 0.00)
-                            val isBold = importance >= 0.45
-                            println("Importance value for key '$key': $importance")
-                            val fontSize = if (importance in 0.0..0.99) {
-                                val importanceToFontSize = mapOf(
-                                    0.99 to 24f,
-                                    0.50 to 23f,
-                                    0.45 to 22f,
-                                    0.40 to 20f,
-                                    0.35 to 18f,
-                                    0.30 to 16f,
-                                    0.25 to 14f,
-                                    0.20 to 12f,
-                                    0.10 to 11f
-                                )
-                                importanceToFontSize.entries.firstOrNull { it.key <= importance }?.value
-                                    ?: importanceToFontSize.values.lastOrNull()
-                            } else {
-                                10f
-                            }
-                            println("Importance value for key '$key': $fontSize")
-                            val spannableString = SpannableString("$lowerKey, ")
-                            if (fontSize != null) {
-                                spannableString.setSpan(
-                                    AbsoluteSizeSpan(fontSize.toInt(), true),
-                                    0,
-                                    spannableString.length,
-                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                                )
-                            }
-                            if (isBold) {
-                                spannableString.setSpan(
-                                    StyleSpan(Typeface.BOLD),
-                                    0,
-                                    spannableString.length,
-                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                                )
-                            }
-                            spannableStringBuilder.append(spannableString)
-                        }
-                        if (spannableStringBuilder.length >= 2) {
-                            spannableStringBuilder.delete(
-                                spannableStringBuilder.length - 2,
-                                spannableStringBuilder.length
-                            )
-                        }
-                        binding.tvRecommendationExplained.text = spannableStringBuilder
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
-                    }
-                } else {
-                    binding.tvRecommendationExplained.text = editable
-                }
-                val recommendationTitle = "Recommendation #" + (currentRecommendationIndex + 1)
-                binding.tvRecommendedMovie.text = recommendationTitle
-            }
+
+        if (infoMode) {
+            binding.info.text= "Factors";
+            binding.tvRecommendationExplained.text = recommendation.overview.toString();
+
         }
+        else {
+            binding.info.text= "Info";
+
+            Log.d("DisplayRecommendation", "$currentRecommendationIndex,${recommendationBuffer.size}")
+            if (currentRecommendationIndex < recommendationBuffer.size) {
+                runOnUiThread {
+
+                    currentMovie = recommendation;
+
+                    val title = recommendation.title
+                    val fullPosterPath = recommendation.fullPosterPath
+                    val recommendationFactors = recommendation.explanation
+                    Picasso.get().load(fullPosterPath).into(binding.ivRecommendedMovie)
+                    var editable: Editable = Editable.Factory.getInstance().newEditable(title)
+                    binding.titleText.text = editable
+                    editable = Editable.Factory.getInstance().newEditable(recommendationFactors)
+                    println("CONTENT = $editable")
+                    if (editable.startsWith("{")) {
+                        try {
+                            val jsonObject = JSONObject(editable.toString())
+                            val keysList = jsonObject.keys().asSequence().map { it.toString() }.toList()
+                            val caseInsensitiveComparator = Comparator<String> { str1, str2 ->
+                                str1.compareTo(
+                                        str2,
+                                        ignoreCase = true
+                                )
+                            }
+                            val sortedKeys = TreeSet(caseInsensitiveComparator)
+                            sortedKeys.addAll(keysList)
+                            val spannableStringBuilder = SpannableStringBuilder()
+                            for (key in sortedKeys) {
+                                val lowerKey = key.toLowerCase()
+                                val importance = jsonObject.optDouble(lowerKey, 0.00)
+                                val isBold = importance >= 0.45
+                                println("Importance value for key '$key': $importance")
+                                val fontSize = if (importance in 0.0..0.99) {
+                                    val importanceToFontSize = mapOf(
+                                            0.99 to 24f,
+                                            0.50 to 23f,
+                                            0.45 to 22f,
+                                            0.40 to 20f,
+                                            0.35 to 18f,
+                                            0.30 to 16f,
+                                            0.25 to 14f,
+                                            0.20 to 12f,
+                                            0.10 to 11f
+                                    )
+                                    importanceToFontSize.entries.firstOrNull { it.key <= importance }?.value
+                                            ?: importanceToFontSize.values.lastOrNull()
+                                } else {
+                                    10f
+                                }
+                                println("Importance value for key '$key': $fontSize")
+                                val spannableString = SpannableString("$lowerKey, ")
+                                if (fontSize != null) {
+                                    spannableString.setSpan(
+                                            AbsoluteSizeSpan(fontSize.toInt(), true),
+                                            0,
+                                            spannableString.length,
+                                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                    )
+                                }
+                                if (isBold) {
+                                    spannableString.setSpan(
+                                            StyleSpan(Typeface.BOLD),
+                                            0,
+                                            spannableString.length,
+                                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                    )
+                                }
+                                spannableStringBuilder.append(spannableString)
+                            }
+                            if (spannableStringBuilder.length >= 2) {
+                                spannableStringBuilder.delete(
+                                        spannableStringBuilder.length - 2,
+                                        spannableStringBuilder.length
+                                )
+                            }
+                            binding.tvRecommendationExplained.text = spannableStringBuilder
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
+                        }
+                    } else {
+                        binding.tvRecommendationExplained.text = editable
+                    }
+                    val recommendationTitle = "Recommendation #" + (currentRecommendationIndex + 1)
+                    binding.tvRecommendedMovie.text = recommendationTitle
+                }
+            }
+
+        }
+
+
+
     }
 
     private fun updateLoadingState(loadingRecommendations: Boolean) {
