@@ -1,5 +1,5 @@
 import { MovieRating, Movie} from './interfaces'
-import { getSuggestions, getSuggestionsRandom} from './api';
+import { get3NN, getNeighbourExplanation, getSuggestionsRandom} from './api';
 import { notifyProcessingDone} from './sio';
 
 export class Room {
@@ -9,9 +9,9 @@ export class Room {
     private names: Map<string, string>;
 
     private status: boolean = false;
+    //TODO: can be changed to a higher number
     private numberOfRecommendations: number = 5;
     private numberOfSwipes: number = 3;
-    private likeThreshold: number = 0.75;
 
     private nextSuggestions: Movie[] = [];
     private movieRatings: Map<Movie, MovieRating[]> = new Map<Movie, MovieRating[]>()
@@ -30,11 +30,7 @@ export class Room {
 
         this.names = new Map();
         this.names.set(host, this.getName());
-  /*
-        this.numberOfRecommendations = 5;
-        this.numberOfSwipes = 3;
-        this.likeThreshold = 0.75;
-  */
+
         (async () => {
             this.nextSuggestions = await getSuggestionsRandom(this.numberOfSwipes);
         })();
@@ -78,43 +74,108 @@ export class Room {
 
     //Potential for concurrency problems!
     async addMovieRating(movie: Movie, rating: MovieRating): Promise<void>{
-        //console.log(movie, rating);
         let ratings: MovieRating[] = this.movieRatings.get(movie) || [];
         ratings.push(rating); // This is safe because ratings is guaranteed to be an array
         this.movieRatings.set(movie, ratings);
 
-        if( this.isAllRatingsSubmitted()){
-            const liked = this.getMoviesOverLikeThreshold();
-
-            for( const movie of liked) {
-                this.topRecommendation = this.topRecommendation.concat(movie);
-                this.topRecommendation = this.topRecommendation.concat(await getSuggestions(movie.title));
-                //console.log('liked', movie, 'recommended', this.topRecommendation);
-            }
-            notifyProcessingDone(this.members, this.topRecommendation);
+        if (this.isAllRatingsSubmitted()) {
+            this.setupScoreMovieArrays();
+            await this.getExplanations();
         }
     }
 
-    getMoviesOverLikeThreshold(): Movie[]{
-        const moviesOverThreshold: Movie[] = []
-
-        for(const movie of this.movieRatings.keys()){
-            let positive:number = 0;
-            const ratings: MovieRating[] = this.movieRatings.get(movie)!!;
-
-            for(const rating of ratings){
-                if(rating.rating == 1){ positive += 1;}
+    private combinedRatings = new Map<Movie,number>();
+    // set up the combined ratings map for each unique movie
+    setCombinedRatings() {
+        let moviesIndices = new Map<number,Movie>();
+        for (let [movie, ratings] of this.movieRatings) {
+            let movieIndex = movie.index;
+            let movieToUse = moviesIndices.has(movieIndex) ? moviesIndices.get(movieIndex) as Movie : movie;
+            moviesIndices.set(movieIndex,movieToUse);
+            let existingRating = this.combinedRatings.get(movieToUse) || 0;
+            for (let rating of ratings) {
+                existingRating += rating.rating;
             }
+            this.combinedRatings.set(movieToUse, existingRating);
+        }
+    }
 
-            const likePercentage = positive/ratings.length
-            if( likePercentage> this.likeThreshold){
-                movie.explanation = `${likePercentage*100}% of you liked this movie`
+    private perfectScoreMovies: Movie[] = [];
+    private secondHighestScoreMovies: Movie[] = [];
+    private thirdHighestScoreMovies: Movie[] = [];
+    // set up the movie arrays based on the combined ratings
+    setupScoreMovieArrays() {
+        this.setCombinedRatings();
 
-                // Do not iterate over title strings, instead connect every like to the Movie object in the map
-                moviesOverThreshold.push(movie);
+        let perfectScore = this.members.length;
+        let scores = Array.from(this.combinedRatings.values()).sort((a, b) => b - a);
+        let secondHighestScore = scores[1];
+        let thirdHighestScore = scores[2];
+
+        for (let [movie,rating] of this.combinedRatings) {
+            if (rating === perfectScore) {
+                movie.explanation = `100% of you liked this movie`
+                this.perfectScoreMovies.push(movie);
+            } else if (rating === secondHighestScore && secondHighestScore >= 0) {
+                this.secondHighestScoreMovies.push(movie);
+            } else if (rating === thirdHighestScore && thirdHighestScore > 0) {
+                this.thirdHighestScoreMovies.push(movie);
             }
         }
-        return moviesOverThreshold;
+    }
+
+    // remove all other occurences of a movie in the array once one copy is chosen at random
+    removeAllOtherOccurences(array: { parent: string, child: string }[], movie: { parent: string, child: string }) {
+        return array.filter((value) => value.child !== movie.child);
+    }
+
+    private nearestNeighbours: { parent: string, child: string }[] = [];
+    async getExplanations(): Promise<void> {
+        // perfect score movies are always recommended
+        this.topRecommendation.push(...this.perfectScoreMovies);
+        // determine how many more movies should be recommended, see TODO above
+        let amntRandomMovies = this.numberOfRecommendations - this.topRecommendation.length;
+       
+        // perfect neighbours get 3 copies, 2nd highest get 2 copies, 3rd highest get 1 copy
+        let moviesObject = [
+            {movies: this.perfectScoreMovies, copies: 3},
+            {movies: this.secondHighestScoreMovies, copies: 2},
+            {movies: this.thirdHighestScoreMovies, copies: 1}
+        ]
+    
+        // get the 3 nearest neighbours for each movie and fill the array with the correct amount of copies
+        for (let moviesObj of moviesObject) {
+            for (let movie of moviesObj.movies) {
+                let nn = await get3NN(movie.title);
+                for (let n of nn) {
+                    for (let i=0; i<moviesObj.copies; i++) {
+                        let movieWithParent = {
+                            parent: movie.title,
+                            child: n
+                        }
+                        this.nearestNeighbours.push(movieWithParent);
+                    }
+                }
+            }
+        }
+
+        // randomly select movies until enough are selected
+        let randomMovies = [];
+        for (let i = 0; i < amntRandomMovies; i++) {
+            let randomIndex = Math.floor(Math.random() * this.nearestNeighbours.length);
+            let selectedMovie = this.nearestNeighbours[randomIndex];
+            randomMovies.push(selectedMovie);
+            this.nearestNeighbours = this.removeAllOtherOccurences(this.nearestNeighbours,selectedMovie);
+        }
+    
+        // get the explanation for each randomly selected movie
+        for (let movie of randomMovies) {
+            if (movie !== undefined) {
+                let childExplanation = await getNeighbourExplanation(movie.parent, movie.child);
+                this.topRecommendation.push(childExplanation);
+            }
+        }
+        notifyProcessingDone(this.members,this.topRecommendation);
     }
 
     getSuggestions(): Movie[]{
