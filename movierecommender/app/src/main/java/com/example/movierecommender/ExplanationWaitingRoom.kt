@@ -45,6 +45,9 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
     private var currentRecommendationIndex = 0
     var scrollingText: TextView? = null
 
+    var currentMovie: Movie? = null
+    var infoMode = false;
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ExplanationWaitingRoomBinding.inflate(layoutInflater)
@@ -96,6 +99,11 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         })
+
+        binding.info.setOnClickListener(View.OnClickListener {
+            infoMode = !infoMode;
+            displayRecommendation(currentMovie!!);
+        })
     }
 
     fun insertSpaceBetweenCapitalAndNonCapital(input: String): String {
@@ -111,10 +119,37 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
         return result.toString()
     }
 
+    private fun showSliders() {
+        binding.tvRecommendationFactors.visibility = View.VISIBLE
+        binding.tvRecommendationImportance.visibility = View.VISIBLE
+        binding.expl.visibility = View.VISIBLE
+        binding.explText.visibility = View.VISIBLE
+        binding.tvExplText.visibility = View.GONE
+    }
+
+    private fun hideSliders(infoText : String) {
+        binding.tvRecommendationFactors.visibility = View.GONE
+        binding.tvRecommendationImportance.visibility = View.GONE
+        binding.expl.visibility = View.GONE
+        binding.explText.visibility = View.GONE
+        binding.tvExplText.visibility = View.VISIBLE
+        binding.tvExplText.text = infoText
+
+        if (infoMode) {
+            binding.info.text= "Factors";
+        }
+        else {
+            binding.info.text= "Info";
+        }
+    }
+
     private fun displayRecommendation(recommendation: Movie) {
         Log.d("DisplayRecommendation", "$currentRecommendationIndex,${recommendationBuffer.size}")
         if (currentRecommendationIndex < recommendationBuffer.size) {
             runOnUiThread {
+
+                currentMovie = recommendation
+
                 val title = recommendation.title
                 val fullPosterPath = recommendation.fullPosterPath
                 val recommendationFactors = recommendation.explanation
@@ -165,12 +200,12 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                             linearLayoutText.addView(textView)
                             linearLayoutSlider.addView(seekBar)
 
-                            binding.tvRecommendationFactors.visibility = View.VISIBLE
-                            binding.tvRecommendationImportance.visibility = View.VISIBLE
-                            binding.expl.visibility = View.VISIBLE
-                            binding.explText.visibility = View.VISIBLE
-                            binding.tvExplText.visibility = View.GONE
-
+                            if (infoMode) {
+                                hideSliders(currentMovie!!.overview);
+                            }
+                            else {
+                                showSliders();
+                            }
                         }
                     }
                     catch (e: JSONException) {
@@ -178,12 +213,12 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                     }
                 }
                 else {
-                    binding.tvRecommendationFactors.visibility = View.GONE
-                    binding.tvRecommendationImportance.visibility = View.GONE
-                    binding.expl.visibility = View.GONE
-                    binding.explText.visibility = View.GONE
-                    binding.tvExplText.visibility = View.VISIBLE
-                    binding.tvExplText.text = editable
+                    if (infoMode) {
+                        hideSliders(currentMovie!!.overview);
+                    }
+                    else {
+                        hideSliders(editable.toString());
+                    }
                 }
 /*
 
