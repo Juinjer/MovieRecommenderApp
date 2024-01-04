@@ -23,7 +23,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginTop="6dp"
         android:layout_marginBottom="6dp"
         android:ellipsize="marquee"
         android:focusable="true"
@@ -68,7 +67,7 @@
     <TextView
         android:id="@+id/tvRecommendationExplained"
         android:layout_width="374dp"
-        android:layout_height="73dp"
+        android:layout_height="90dp"
         android:text="Explanations for movie..."
         android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@+id/exit"

@@ -113,14 +113,6 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                     try {
                         val jsonObject = JSONObject(editable.toString())
                         val keysList = jsonObject.keys().asSequence().map { it.toString() }.toList()
-                        val importanceToFontSize = mapOf(
-                            0.50 to 20f,
-                            0.45 to 18f,
-                            0.40 to 16f,
-                            0.30 to 14f,
-                            0.20 to 12f,
-                            0.10 to 10f
-                        )
                         val caseInsensitiveComparator = Comparator<String> { str1, str2 ->
                             str1.compareTo(
                                 str2,
@@ -134,39 +126,34 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                             val lowerKey = key.toLowerCase()
                             val importance = jsonObject.optDouble(lowerKey, 0.00)
                             val isBold = importance >= 0.45
-
-                            println("Importance value for key '$key': $importance") // Add this line
-
-
-                            //TODO deze lijkt random?
-                            fun findFontSize(
-                                importance: Double,
-                                mapping: Map<Double, Float>
-                            ): Float {
-                                val tolerance = 0.01
-                                for ((key, value) in mapping) {
-                                    if (importance in (key - tolerance)..(key + tolerance)) {
-                                        return value
-                                    }
-                                }
-                                return mapping.values.firstOrNull() ?: 10f
+                            println("Importance value for key '$key': $importance")
+                            val fontSize = if (importance in 0.0..0.99) {
+                                val importanceToFontSize = mapOf(
+                                    0.99 to 24f,
+                                    0.50 to 23f,
+                                    0.45 to 22f,
+                                    0.40 to 20f,
+                                    0.35 to 18f,
+                                    0.30 to 16f,
+                                    0.25 to 14f,
+                                    0.20 to 12f,
+                                    0.10 to 11f
+                                )
+                                importanceToFontSize.entries.firstOrNull { it.key <= importance }?.value
+                                    ?: importanceToFontSize.values.lastOrNull()
+                            } else {
+                                10f
                             }
-                            val roundedImportance = BigDecimal(importance).setScale(2, RoundingMode.HALF_EVEN).toDouble()
-                            val fontSize = findFontSize(roundedImportance, importanceToFontSize)
-                            println("FontSize for '$key': $fontSize")
-
-
-
-                            //TODO werkt op vreemde wijze niet...
-//                            val fontSize = importanceToFontSize[importance] ?: 20f
-
+                            println("Importance value for key '$key': $fontSize")
                             val spannableString = SpannableString("$lowerKey, ")
-                            spannableString.setSpan(
-                                AbsoluteSizeSpan(fontSize.toInt(), true),
-                                0,
-                                spannableString.length,
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                            )
+                            if (fontSize != null) {
+                                spannableString.setSpan(
+                                    AbsoluteSizeSpan(fontSize.toInt(), true),
+                                    0,
+                                    spannableString.length,
+                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                )
+                            }
                             if (isBold) {
                                 spannableString.setSpan(
                                     StyleSpan(Typeface.BOLD),
