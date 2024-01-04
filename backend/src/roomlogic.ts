@@ -125,11 +125,11 @@ export class Room {
     }
 
     // remove all other occurences of a movie in the array once one copy is chosen at random
-    removeAllOtherOccurences(array: { parent: Movie, child: Movie }[], movie: { parent: Movie, child: Movie }) {
-        return array.filter((value) => value.child.title !== movie.child.title);
+    removeAllOtherOccurences(array: { parent: string, child: string }[], movie: { parent: string, child: string }) {
+        return array.filter((value) => value.child !== movie.child);
     }
 
-    private nearestNeighbours: { parent: Movie, child: Movie }[] = [];
+    private nearestNeighbours: { parent: string, child: string }[] = [];
     async getExplanations(): Promise<void> {
         // perfect score movies are always recommended
         this.topRecommendation.push(...this.perfectScoreMovies);
@@ -150,7 +150,7 @@ export class Room {
                 for (let n of nn) {
                     for (let i=0; i<moviesObj.copies; i++) {
                         let movieWithParent = {
-                            parent: movie,
+                            parent: movie.title,
                             child: n
                         }
                         this.nearestNeighbours.push(movieWithParent);
@@ -158,7 +158,7 @@ export class Room {
                 }
             }
         }
-        
+
         // randomly select movies until enough are selected
         let randomMovies = [];
         for (let i = 0; i < amntRandomMovies; i++) {
@@ -172,8 +172,6 @@ export class Room {
         for (let movie of randomMovies) {
             if (movie !== undefined) {
                 let childExplanation = await getNeighbourExplanation(movie.parent, movie.child);
-                console.log("roomlogic");
-                console.log(childExplanation);
                 this.topRecommendation.push(childExplanation);
             }
         }
