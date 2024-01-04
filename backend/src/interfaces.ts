@@ -5,7 +5,7 @@ export interface MovieRating {
 }
 
 export interface Movie {
-    index: number;
+    id: number;
     title: string;
     overview: string;
     full_poster_path: string;

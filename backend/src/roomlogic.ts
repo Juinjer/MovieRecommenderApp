@@ -89,9 +89,9 @@ export class Room {
     setCombinedRatings() {
         let moviesIndices = new Map<number,Movie>();
         for (let [movie, ratings] of this.movieRatings) {
-            let movieIndex = movie.index;
-            let movieToUse = moviesIndices.has(movieIndex) ? moviesIndices.get(movieIndex) as Movie : movie;
-            moviesIndices.set(movieIndex,movieToUse);
+            let movieId = movie.id;
+            let movieToUse = moviesIndices.has(movieId) ? moviesIndices.get(movieId) as Movie : movie;
+            moviesIndices.set(movieId,movieToUse);
             let existingRating = this.combinedRatings.get(movieToUse) || 0;
             for (let rating of ratings) {
                 existingRating += rating.rating;
@@ -124,12 +124,12 @@ export class Room {
         }
     }
 
-    // remove all other occurences of a movie in the array once one copy is chosen at random
-    removeAllOtherOccurences(array: { parent: Movie, child: Movie }[], movie: { parent: Movie, child: Movie }) {
-        return array.filter((value) => value.child.title !== movie.child.title);
+    // remove all other occurrences of a movie in the array once one copy is chosen at random
+    removeAllOtherOccurences(array: { parent: Movie, childId: number }[], movie: { parent: Movie, childId: number }) {
+        return array.filter((value) => value.childId !== movie.childId);
     }
 
-    private nearestNeighbours: { parent: Movie, child: Movie }[] = [];
+    private nearestNeighbours: { parent: Movie, childId: number }[] = [];
     async getExplanations(): Promise<void> {
         // perfect score movies are always recommended
         this.topRecommendation.push(...this.perfectScoreMovies);
@@ -143,15 +143,15 @@ export class Room {
             {movies: this.thirdHighestScoreMovies, copies: 1}
         ]
     
-        // get the 3 nearest neighbours for each movie and fill the array with the correct amount of copies
+        // get the 3 nearest neighbours indices for each movie and fill the array with the correct amount of copies
         for (let moviesObj of moviesObject) {
             for (let movie of moviesObj.movies) {
-                let nn = await get3NN(movie.title);
-                for (let n of nn) {
+                let nn_ids = await get3NN(movie.id);
+                for (let n_id of nn) {
                     for (let i=0; i<moviesObj.copies; i++) {
                         let movieWithParent = {
                             parent: movie,
-                            child: n
+                            childIndex: n_id
                         }
                         this.nearestNeighbours.push(movieWithParent);
                     }
@@ -171,7 +171,7 @@ export class Room {
         // get the explanation for each randomly selected movie
         for (let movie of randomMovies) {
             if (movie !== undefined) {
-                let childExplanation = await getNeighbourExplanation(movie.parent, movie.child);
+                let childExplanation = await getNeighbourExplanation(movie.parent.id, movie.childId);
                 console.log("roomlogic");
                 console.log(childExplanation);
                 this.topRecommendation.push(childExplanation);

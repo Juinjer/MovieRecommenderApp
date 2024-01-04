@@ -13,10 +13,19 @@ df = pd.read_csv("new_knn.csv")
 tfidf = TfidfVectorizer(stop_words="english")
 tfidf_matrix = tfidf.fit_transform(df['soup'])
 cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
+
+
 # print(tfidf_matrix.shape)
 
 # model = NearestNeighbors(metric='cosine')
 # model.fit(tfidf_matrix)
+
+
+def get_movie_info_by_id(movie_id):
+    movie_info = df.loc[df['id'] == movie_id]
+    if not movie_info.empty:
+        return movie_info
+    raise Exception("Movie id not found")
 
 
 def get_random_movies(number_of_movies, top=100):
@@ -26,20 +35,24 @@ def get_random_movies(number_of_movies, top=100):
 
     return random_movies
 
-def get_similar_movies(movie_title, k=3):
-    movie_index = df[df['title'] == movie_title].index[0]
+
+def get_similar_movies(movie_id, k=3):
+    movie_index = df[df['id'] == movie_id].index[0]
     sim_scores = list(enumerate(cosine_sim[movie_index]))
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-    sim_scores = sim_scores[1:k+1]
+    sim_scores = sim_scores[1:k + 1]
     movie_indices = [i[0] for i in sim_scores]
     return df.iloc[movie_indices]
 
-def get_neighbour_explanation(parent,child):
-    parent_soup = df.loc[parent.index, 'soup']
-    child_soup = df.loc[child.index, 'soup']
+
+def get_neighbour_explanation(parent_id, child_id):
+    parent_soup = get_movie_info_by_id(parent_id)['soup'].item()
+    child_soup = get_movie_info_by_id(child_id)['soup'].item()
+
     parent_vector = tfidf.transform([parent_soup])
     child_vector = tfidf.transform([child_soup])
-    parent_words = {word: val for word, val in zip(tfidf.get_feature_names_out(), parent_vector.toarray()[0]) if val > 0}
+    parent_words = {word: val for word, val in zip(tfidf.get_feature_names_out(), parent_vector.toarray()[0]) if
+                    val > 0}
     child_words = {word: val for word, val in zip(tfidf.get_feature_names_out(), child_vector.toarray()[0]) if val > 0}
     common_words = set(parent_words.keys()) & set(child_words.keys())
     explanation = {word: (parent_words[word], child_words[word]) for word in common_words}
@@ -48,6 +61,7 @@ def get_neighbour_explanation(parent,child):
     processed = process_top(top_10_words, child_soup)
     return processed
 
+
 def process_top(top, soup):
     actors = soup.split()[-6:]
     actors_lower = [name.lower() for name in actors]
@@ -55,7 +69,7 @@ def process_top(top, soup):
 
     proccessed = {}
 
-    for key,val in top.items():
+    for key, val in top.items():
         if key in actors_lower:
             index = actors_lower.index(key)
             proccessed[split_actors[index]] = val
