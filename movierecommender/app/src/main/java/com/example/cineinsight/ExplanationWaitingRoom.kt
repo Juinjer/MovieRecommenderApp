@@ -221,6 +221,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 binding.tvRecommendationExplained.visibility = View.GONE
                 binding.swLeftBtn.visibility = View.GONE
                 binding.swRightBtn.visibility = View.GONE
+                binding.info.visibility = View.GONE
             } else {
                 // Hide loading state
                 binding.tvLoadingRecommendations.visibility = View.GONE
@@ -234,6 +235,7 @@ class ExplanationWaitingRoom : AppCompatActivity(), GestureDetector.OnGestureLis
                 // Update swipe button visibility
                 binding.swLeftBtn.visibility = View.GONE
                 binding.swRightBtn.visibility = View.VISIBLE
+                binding.info.visibility = View.VISIBLE
             }
         }
     }
